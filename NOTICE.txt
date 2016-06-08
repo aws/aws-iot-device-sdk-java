@@ -1,0 +1,13 @@
+AWS IoT Device SDK for Java
+Copyright 2010-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+This product includes software developed by
+Amazon Technologies, Inc (http://www.amazon.com/).
+
+**********************
+THIRD PARTY COMPONENTS
+**********************
+This software includes third party software subject to the following copyrights:
+- PKCS#1 and PKCS#8 PEM encoded private key parsing and utility functions from oauth.googlecode.com - Copyright 1998-2010 AOL Inc.
+
+The licenses for these third party components are included in LICENSE.txt

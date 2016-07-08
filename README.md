@@ -76,7 +76,7 @@ of your Maven project.
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
   </dependency>
 </dependencies>
 ```
@@ -88,7 +88,7 @@ The sample applications included with the SDK can also be installed using the fo
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java-samples</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
   </dependency>
 </dependencies>
 ```
@@ -101,9 +101,7 @@ include them to your library build path.
 You will also need to add two libraries the SDK depends on:
 
  * Jackson 2.x, including Jackson-core and Jackson-databind. [download instructions][jackson-download]
- * Paho MQTT client for Java 1.0.x. [download instructions][paho-mqtt-java-download]
-   (Note: If you plan to use MQTT over WebSocket connections, use its development branch or snapshot builds here 
-   https://repo.eclipse.org/content/repositories/paho-snapshots/.)
+ * Paho MQTT client for Java 1.1.x. [download instructions][paho-mqtt-java-download]
 
 ### Build the SDK from the GitHub Source
 You can build both the SDK and its sample applications from the source 

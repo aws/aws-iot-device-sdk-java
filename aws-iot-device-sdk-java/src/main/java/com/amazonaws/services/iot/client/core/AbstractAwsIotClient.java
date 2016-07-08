@@ -279,12 +279,49 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
         }
     }
 
-    public void dispatch(AWSIotMessage message) {
-        AWSIotTopic topic = subscriptions.get(message.getTopic());
-        if (topic != null) {
-            topic.onMessage(message);
-        } else {
-        	LOGGER.warning("Unexpected message received from topic " + message.getTopic());
+    public boolean topicFilterMatch(String topicFilter, String topic) {
+        if (topicFilter == null || topic == null) {
+            return false;
+        }
+
+        String[] filterTokens = topicFilter.split("/");
+        String[] topicTokens = topic.split("/");
+        if (filterTokens.length > topicTokens.length) {
+            return false;
+        }
+
+        for (int i = 0; i < filterTokens.length; i++) {
+            if (filterTokens[i].equals("#")) {
+                // '#' must be the last character
+                return ((i + 1) == filterTokens.length);
+            }
+
+            if (!(filterTokens[i].equals(topicTokens[i]) || filterTokens[i].equals("+"))) {
+                return false;
+            }
+        }
+
+        return (filterTokens.length == topicTokens.length);
+    }
+
+    public void dispatch(final AWSIotMessage message) {
+        boolean matches = false;
+
+        for (String topicFilter : subscriptions.keySet()) {
+            if (topicFilterMatch(topicFilter, message.getTopic())) {
+                final AWSIotTopic topic = subscriptions.get(topicFilter);
+                scheduleTask(new Runnable() {
+                    @Override
+                    public void run() {
+                        topic.onMessage(message);
+                    }
+                });
+                matches = true;
+            }
+        }
+
+        if (!matches) {
+            LOGGER.warning("Unexpected message received from topic " + message.getTopic());
         }
     }
 

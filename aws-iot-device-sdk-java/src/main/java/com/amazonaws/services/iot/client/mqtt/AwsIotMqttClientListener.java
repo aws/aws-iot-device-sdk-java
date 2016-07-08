@@ -52,14 +52,8 @@ public class AwsIotMqttClientListener implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage arg1) throws Exception {
-        final AWSIotMessage message = new AWSIotMessage(topic, AWSIotQos.valueOf(arg1.getQos()), arg1.getPayload());
-
-        client.scheduleTask(new Runnable() {
-            @Override
-            public void run() {
-                client.dispatch(message);
-            }
-        });
+        AWSIotMessage message = new AWSIotMessage(topic, AWSIotQos.valueOf(arg1.getQos()), arg1.getPayload());
+        client.dispatch(message);
     }
 
 }

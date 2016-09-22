@@ -322,8 +322,7 @@ public class MyDevice extends AWSIotDevice {
 
 MyDevice device = new MyDevice(thingName);
 
-long reportInterval = 5000;            // milliseconds. Default 
-interval is 3000.
+long reportInterval = 5000;            // milliseconds. Default interval is 3000.
 device.setReportInterval(reportInterval);
 
 client.attach(device);

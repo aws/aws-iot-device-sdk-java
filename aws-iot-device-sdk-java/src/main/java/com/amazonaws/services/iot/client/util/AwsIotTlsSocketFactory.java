@@ -28,6 +28,7 @@ import java.security.UnrecoverableKeyException;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -117,6 +118,11 @@ public class AwsIotTlsSocketFactory extends SSLSocketFactory {
     private Socket ensureTls(Socket socket) {
         if (socket != null && (socket instanceof SSLSocket)) {
             ((SSLSocket) socket).setEnabledProtocols(new String[] { TLS_V_1_2 });
+
+            // Ensure hostname is validated againt the CN in the certificate
+            SSLParameters sslParams = new SSLParameters();
+            sslParams.setEndpointIdentificationAlgorithm("HTTPS");
+            ((SSLSocket) socket).setSSLParameters(sslParams);
         }
         return socket;
     }

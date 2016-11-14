@@ -212,6 +212,22 @@ public abstract class AwsIotConnection implements AwsIotConnectionCallback {
     }
 
     /**
+     * Updates credentials for the connection, which will be used for new
+     * connections.
+     *
+     * @param awsAccessKeyId
+     *            the AWS access key id
+     * @param awsSecretAccessKey
+     *            the AWS secret access key
+     * @param sessionToken
+     *            Session token received along with the temporary credentials
+     *            from services like STS server, AssumeRole, or Amazon Cognito.
+     */
+    public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {
+        // default implementation does nothing
+    }
+
+    /**
      * The actual subscribe method exposed by this class.
      *
      * @param message

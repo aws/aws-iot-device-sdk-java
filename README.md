@@ -76,7 +76,7 @@ of your Maven project.
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
   </dependency>
 </dependencies>
 ```
@@ -88,7 +88,7 @@ The sample applications included with the SDK can also be installed using the fo
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java-samples</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
   </dependency>
 </dependencies>
 ```
@@ -99,8 +99,7 @@ and copy the JAR files to your project's library directory, and then update your
 include them to your library build path. 
 
 You will also need to add two libraries the SDK depends on:
-
- * Jackson 2.x, including Jackson-core and Jackson-databind. [download instructions][jackson-download]
+ * Jackson 2.x, including [Jackson-core] [jackson-core] and [Jackson-databind] [jackson-databind] 
  * Paho MQTT client for Java 1.1.x. [download instructions][paho-mqtt-java-download]
 
 ### Build the SDK from the GitHub Source
@@ -216,7 +215,7 @@ To subscribe to a topic:
 
 ```java
 public class MyTopic extends AWSIotTopic {
-    public MyOwnMessage(String topic, AWSIotQos qos) {
+    public MyTopic(String topic, AWSIotQos qos) {
         super(topic, qos);
     }
 
@@ -259,7 +258,7 @@ To access a shadow using a non-blocking API:
 
 ```java
 public class MyShadowMessage extends AWSIotMessage {
-    public MyMessage() {
+    public MyShadowMessage() {
         super(null, null);
     }
 
@@ -484,7 +483,8 @@ For any other questions about AWS IoT, contact [AWS Support][aws-support].
 [aws-iot-forum]: https://forums.aws.amazon.com/forum.jspa?forumID=210
 [aws-iot-console]: http://aws.amazon.com/iot/
 [latest-jar]: https://s3.amazonaws.com/aws-iot-device-sdk-java/aws-iot-device-sdk-java-LATEST.zip
-[jackson-download]: http://wiki.fasterxml.com/JacksonDownload
+[jackson-core]: https://github.com/FasterXML/jackson-core
+[jackson-databind]: https://github.com/FasterXML/jackson-databind
 [paho-mqtt-java-download]: https://eclipse.org/paho/clients/java/
 [api-docs]: http://aws-iot-device-sdk-java-docs.s3-website-us-east-1.amazonaws.com/
 [aws-iot-ecc-blog]: https://aws.amazon.com/blogs/iot/elliptic-curve-cryptography-and-forward-secrecy-support-in-aws-iot-3/

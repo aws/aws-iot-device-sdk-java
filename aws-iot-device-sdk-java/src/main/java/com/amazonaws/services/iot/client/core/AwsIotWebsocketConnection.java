@@ -28,6 +28,8 @@ import com.amazonaws.services.iot.client.util.AwsIotWebSocketUrlSigner;
  */
 public class AwsIotWebsocketConnection extends AwsIotMqttConnection {
 
+    private AwsIotWebSocketUrlSigner urlSigner;
+
     public AwsIotWebsocketConnection(AbstractAwsIotClient client, String awsAccessKeyId, String awsSecretAccessKey)
             throws AWSIotException {
         this(client, awsAccessKeyId, awsSecretAccessKey, null);
@@ -39,13 +41,27 @@ public class AwsIotWebsocketConnection extends AwsIotMqttConnection {
 
         // Port number must be included in the endpoint for signing otherwise
         // the signature verification will fail. This is because the Paho client
-        // library (1.0.3) always includes port number in the host line of the HTTP
-        // request header, e.g "Host: data.iot.us-east-1.amazonaws.com:443".
-        String signedUrl = AwsIotWebSocketUrlSigner.getSignedUrl(client.getClientEndpoint() + ":443", awsAccessKeyId,
-                awsSecretAccessKey, sessionToken, null);
+        // library always includes port number in the host line of the
+        // HTTP request header, e.g "Host: data.iot.us-east-1.amazonaws.com:443".
+        urlSigner = new AwsIotWebSocketUrlSigner(client.getClientEndpoint() + ":443");
+        urlSigner.updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
+    }
+
+    @Override
+    public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {
+        urlSigner.updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
+    }
+
+    @Override
+    public Set<String> getServerUris() {
         Set<String> uris = new HashSet<>();
-        uris.add(signedUrl);
-        this.setServerUris(uris);
+        try {
+            uris.add(urlSigner.getSignedUrl(null));
+        } catch (AWSIotException e) {
+            throw new AwsIotRuntimeException(e);
+        }
+
+        return uris;
     }
 
 }

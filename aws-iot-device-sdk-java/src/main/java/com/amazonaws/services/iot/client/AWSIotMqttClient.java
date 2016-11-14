@@ -187,6 +187,25 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
     }
 
     /**
+     * Updates credentials used for signing Secure WebSocket URLs. When temporary
+     * credentails used for the WebSocket connection are expired, newer
+     * credentails can be supplied through this API to allow new connections to
+     * be reestablished using the new credentails.
+     *
+     * @param awsAccessKeyId
+     *            the AWS access key id
+     * @param awsSecretAccessKey
+     *            the AWS secret access key
+     * @param sessionToken
+     *            Session token received along with the temporary credentials
+     *            from services like STS server, AssumeRole, or Amazon Cognito.
+     */
+    @Override
+    public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {
+        super.updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
+    }
+
+    /**
      * Gets the number of client threads currently configured. Each client has
      * their own thread pool, which is used to execute user callback functions
      * as well as any timeout callback functions requested. By default, the

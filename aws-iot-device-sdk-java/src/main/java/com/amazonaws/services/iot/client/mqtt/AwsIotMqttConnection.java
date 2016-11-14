@@ -49,7 +49,6 @@ public class AwsIotMqttConnection extends AwsIotConnection {
     private MqttAsyncClient mqttClient;
     private AwsIotMqttMessageListener messageListener;
     private AwsIotMqttClientListener clientListener;
-    private Set<String> serverUris;
 
     public AwsIotMqttConnection(AbstractAwsIotClient client, SocketFactory socketFactory, String serverUri)
             throws AWSIotException {
@@ -137,11 +136,7 @@ public class AwsIotMqttConnection extends AwsIotConnection {
     }
 
     public Set<String> getServerUris() {
-        return new HashSet<>(serverUris);
-    }
-
-    public void setServerUris(Set<String> serverUris) {
-        this.serverUris = new HashSet<>(serverUris);
+        return new HashSet<>();
     }
 
     private MqttConnectOptions buildMqttConnectOptions(AbstractAwsIotClient client, SocketFactory socketFactory) {
@@ -152,6 +147,7 @@ public class AwsIotMqttConnection extends AwsIotConnection {
         options.setConnectionTimeout(client.getConnectionTimeout() / 1000);
         options.setKeepAliveInterval(client.getKeepAliveInterval() / 1000);
 
+        Set<String> serverUris = getServerUris();
         if (serverUris != null && !serverUris.isEmpty()) {
             String[] uriArray = new String[serverUris.size()];
             serverUris.toArray(uriArray);

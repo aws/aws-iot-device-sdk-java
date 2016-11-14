@@ -98,6 +98,10 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
         this.connectionType = null;
     }
 
+    public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {
+        this.connection.updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
+    }
+
     public void connect() throws AWSIotException {
         try {
             connect(0, true);

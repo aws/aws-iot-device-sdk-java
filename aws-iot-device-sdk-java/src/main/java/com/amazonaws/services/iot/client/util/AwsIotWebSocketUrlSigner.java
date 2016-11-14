@@ -17,7 +17,9 @@ package com.amazonaws.services.iot.client.util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -58,13 +60,37 @@ public class AwsIotWebSocketUrlSigner {
     /** URI for WebSocket endpoint when doing initial HTTP operation. */
     private static final String CANONICAL_URI = "/mqtt";
     /** endpoint pattern used for validation and extracting region. */
-    private static final Pattern endpointPattern = Pattern.compile("iot\\.([\\w-]+)\\.amazonaws\\.com(\\:\\d+)?$");
+    private static final Pattern EndpointPattern = Pattern.compile("iot\\.([\\w-]+)\\.amazonaws\\.com(\\:\\d+)?$");
+    /** service name used for signing. */
+    private static final String ServiceName = "iotdata";
+
+    private String endpoint;
+    private String regionName;
+    private String awsAccessKeyId;
+    private String sessionToken;
+    private Mac signingSecretMac;
 
     /**
-     * Given the region and service name provided to the client, the endpoint
-     * and the current time return a signed connection URL to be used when
-     * connecting via WebSocket to AWS IoT.
-     * 
+     * Instantiates a new URL signer instance with endpoint only.
+     *
+     * @param endpoint
+     *            service endpoint with or without customer specific URL prefix.
+     */
+    public AwsIotWebSocketUrlSigner(String endpoint) {
+        if (endpoint == null) {
+            throw new IllegalArgumentException("Invalid endpoint provided");
+        }
+
+        this.endpoint = endpoint.trim().toLowerCase();
+        this.regionName = getRegionFromEndpoint(this.endpoint);
+        if (this.regionName == null) {
+            throw new IllegalArgumentException("Could not extract region from endpoint provided");
+        }
+    }
+
+    /**
+     * Instantiates a new URL signer instance with endpoint and credentials.
+     *
      * @param endpoint
      *            service endpoint with or without customer specific URL prefix.
      * @param awsAccessKeyId
@@ -73,6 +99,51 @@ public class AwsIotWebSocketUrlSigner {
      *            AWS secret access key used in SigV4 signature algorithm.
      * @param sessionToken
      *            Session token for temporary credentials.
+     */
+    public AwsIotWebSocketUrlSigner(String endpoint, String awsAccessKeyId, String awsSecretAccessKey,
+            String sessionToken) {
+        this(endpoint);
+
+        updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
+    }
+
+    /**
+     * Updates the signing credentials.
+     *
+     * @param awsAccessKeyId
+     *            AWS access key ID used in SigV4 signature algorithm.
+     * @param awsSecretAccessKey
+     *            AWS secret access key used in SigV4 signature algorithm.
+     * @param sessionToken
+     *            Session token for temporary credentials.
+     */
+    public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {
+        if (awsAccessKeyId == null || awsSecretAccessKey == null) {
+            throw new IllegalArgumentException("Missing required data for signing");
+        }
+
+        this.awsAccessKeyId = awsAccessKeyId.trim();
+
+        try {
+            // secret key is stored as a hash in memory to prevent key leaking
+            // from memory dump
+            byte[] signingSecret = (KEY_PREFIX + awsSecretAccessKey).getBytes(UTF8);
+            this.signingSecretMac = Mac.getInstance(HMAC_ALGORITHM);
+            this.signingSecretMac.init(new SecretKeySpec(signingSecret, HMAC_ALGORITHM));
+
+            this.sessionToken = sessionToken;
+            if (this.sessionToken != null) {
+                this.sessionToken = URLEncoder.encode(this.sessionToken, UTF8);
+            }
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new IllegalArgumentException("Error in initializing signing secret MAC");
+        }
+    }
+
+    /**
+     * Given the signing date return a signed connection URL to be used when
+     * connecting via WebSocket to AWS IoT.
+     *
      * @param signingDate
      *            time value to be used in SigV4 calculations. System current
      *            time will be used if null.
@@ -81,22 +152,7 @@ public class AwsIotWebSocketUrlSigner {
      *             Exception thrown when signed URL can be generated with given
      *             information.
      */
-    public static String getSignedUrl(String endpoint, String awsAccessKeyId, String awsSecretAccessKey,
-            String sessionToken, final Date signingDate) throws AWSIotException {
-        if (endpoint == null || awsAccessKeyId == null || awsSecretAccessKey == null) {
-            throw new IllegalArgumentException("Missing required data for signing");
-        }
-
-        endpoint = endpoint.trim().toLowerCase();
-        String regionName = getRegionFromEndpoint(endpoint);
-        if (regionName == null) {
-            throw new IllegalArgumentException("Invalid endpoint provided");
-        }
-
-        String serviceName = "iotdata";
-        awsAccessKeyId = awsAccessKeyId.trim();
-        awsSecretAccessKey = awsSecretAccessKey.trim();
-
+    public String getSignedUrl(final Date signingDate) throws AWSIotException {
         Date dateToUse = signingDate;
         if (dateToUse == null) {
             dateToUse = new Date();
@@ -106,7 +162,7 @@ public class AwsIotWebSocketUrlSigner {
         String amzDate = getAmzDate(dateToUse);
         String dateStamp = getDateStamp(dateToUse);
         // Credential scoped to date and region
-        String credentialScope = dateStamp + "/" + regionName + "/" + serviceName + "/aws4_request";
+        String credentialScope = dateStamp + "/" + regionName + "/" + ServiceName + "/aws4_request";
         // Now build the canonical string
         StringBuilder canonicalQueryStringBuilder = new StringBuilder();
         canonicalQueryStringBuilder.append("X-Amz-Algorithm=").append(ALGORITHM);
@@ -132,14 +188,9 @@ public class AwsIotWebSocketUrlSigner {
         // Create a string to sign, generate a signing key...
         String stringToSign = ALGORITHM + "\n" + amzDate + "\n" + credentialScope + "\n"
                 + stringToHex(hash(canonicalRequest));
-        byte[] signingKey = getSigningKey(dateStamp, regionName, serviceName, awsSecretAccessKey);
+        byte[] signingKey = getSigningKey(dateStamp);
         // ...and sign the string.
-        byte[] signatureBytes;
-        try {
-            signatureBytes = sign(stringToSign.getBytes(UTF8), signingKey);
-        } catch (UnsupportedEncodingException e) {
-            throw new AWSIotException("Error encoding URL when generating the signature bytes");
-        }
+        byte[] signatureBytes = sign(stringToSign, signingKey);
         String signature = stringToHex(signatureBytes);
 
         // Add the signature to the query string.
@@ -153,20 +204,14 @@ public class AwsIotWebSocketUrlSigner {
         // Amazon Cognito),
         // append the session token to the end of the URL string after signing.
         if (sessionToken != null) {
-            sessionToken = sessionToken.trim();
-            try {
-                sessionToken = URLEncoder.encode(sessionToken, UTF8);
-            } catch (UnsupportedEncodingException e) {
-                throw new AWSIotException("Error encoding URL when appending session token to URL");
-            }
             requestUrl += "&X-Amz-Security-Token=" + sessionToken;
         }
 
         return requestUrl;
     }
 
-    private static String getRegionFromEndpoint(String endpoint) {
-        Matcher matcher = endpointPattern.matcher(endpoint);
+    private String getRegionFromEndpoint(String endpoint) {
+        Matcher matcher = EndpointPattern.matcher(endpoint);
         if (matcher.find()) {
             return matcher.group(1);
         }
@@ -181,7 +226,7 @@ public class AwsIotWebSocketUrlSigner {
      *            data to hex encode.
      * @return hex-encoded string.
      */
-    private static String stringToHex(final byte[] data) {
+    private String stringToHex(final byte[] data) {
         StringBuilder sb = new StringBuilder(data.length * 2);
         for (int i = 0; i < data.length; i++) {
             String hex = Integer.toHexString(data[i]);
@@ -203,28 +248,18 @@ public class AwsIotWebSocketUrlSigner {
      * 
      * @param dateStamp
      *            the current date in short date format.
-     * @param regionName
-     *            AWS region name.
-     * @param serviceName
-     *            service name for IoT service.
-     * @param credentials
-     *            AWS credential set to be used in signing.
      * @return byte array containing the SigV4 signing key.
      * @throws AWSIotException
      */
-    private static byte[] getSigningKey(String dateStamp, String regionName, String serviceName,
-            String awsSecretAccessKey) throws AWSIotException {
+    private byte[] getSigningKey(String dateStamp) throws AWSIotException {
+        if (signingSecretMac == null) {
+            throw new AWSIotException("Signing credentials not provided");
+        }
         // AWS4 uses a series of derived keys, formed by hashing different
         // pieces of data
-        byte[] signingSecret;
-        try {
-            signingSecret = (KEY_PREFIX + awsSecretAccessKey).getBytes(UTF8);
-        } catch (UnsupportedEncodingException e) {
-            throw new AWSIotException("Error encoding URL when generating the signing key");
-        }
-        byte[] signingDate = sign(dateStamp, signingSecret);
+        byte[] signingDate = sign(dateStamp, signingSecretMac);
         byte[] signingRegion = sign(regionName, signingDate);
-        byte[] signingService = sign(serviceName, signingRegion);
+        byte[] signingService = sign(ServiceName, signingRegion);
         return sign(TERMINATOR, signingService);
     }
 
@@ -236,7 +271,7 @@ public class AwsIotWebSocketUrlSigner {
      *            desired date.
      * @return date formatted string in ISO 8601 date + time format.
      */
-    private static String getAmzDate(final Date date) {
+    private String getAmzDate(final Date date) {
         SimpleDateFormat fomatter = new SimpleDateFormat(TIME_PATTERN);
         fomatter.setTimeZone(TIME_ZONE);
         return fomatter.format(date);
@@ -250,7 +285,7 @@ public class AwsIotWebSocketUrlSigner {
      *            desired date.
      * @return date formatted string in short date format.
      */
-    private static String getDateStamp(final Date date) {
+    private String getDateStamp(final Date date) {
         SimpleDateFormat fomatter = new SimpleDateFormat(DATE_PATTERN);
         fomatter.setTimeZone(TIME_ZONE);
         return fomatter.format(date);
@@ -266,7 +301,7 @@ public class AwsIotWebSocketUrlSigner {
      * @throws AmazonClientException
      *             If the hash cannot be computed.
      */
-    private static byte[] hash(String text) throws AWSIotException {
+    private byte[] hash(String text) throws AWSIotException {
         try {
             MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
             md.update(text.getBytes(UTF8));
@@ -287,10 +322,12 @@ public class AwsIotWebSocketUrlSigner {
      * @throws AmazonClientException
      *             in the case of a signature error.
      */
-    private static byte[] sign(String stringData, final byte[] key) throws AWSIotException {
+    private byte[] sign(String stringData, final byte[] key) throws AWSIotException {
         try {
             byte[] data = stringData.getBytes(UTF8);
-            return sign(data, key);
+            Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+            mac.init(new SecretKeySpec(key, HMAC_ALGORITHM));
+            return mac.doFinal(data);
         } catch (Exception e) {
             throw new AWSIotException("Unable to calculate a request signature: " + e.getMessage());
         }
@@ -299,18 +336,17 @@ public class AwsIotWebSocketUrlSigner {
     /**
      * Sign the given data with the key provided.
      *
-     * @param data
-     *            byte buffer of data to be signed.
-     * @param key
-     *            the key for signing.
+     * @param stringData
+     *            String to be signed.
+     * @param mac
+     *            the signing algorithm with key initialized.
      * @return a byte array containing the signed string.
      * @throws AmazonClientException
      *             in the case of a signature error.
      */
-    private static byte[] sign(byte[] data, final byte[] key) throws AWSIotException {
+    private byte[] sign(String stringData, final Mac mac) throws AWSIotException {
         try {
-            Mac mac = Mac.getInstance(HMAC_ALGORITHM);
-            mac.init(new SecretKeySpec(key, HMAC_ALGORITHM));
+            byte[] data = stringData.getBytes(UTF8);
             return mac.doFinal(data);
         } catch (Exception e) {
             throw new AWSIotException("Unable to calculate a request signature: " + e.getMessage());

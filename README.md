@@ -225,10 +225,10 @@ public class MyTopic extends AWSIotTopic {
     }
 }
 
-String topic = "my/own/topic";
+String topicName = "my/own/topic";
 AWSIotQos qos = AWSIotQos.QOS0;
 
-MyTopic topic = new MyTopic(topic, qos);
+MyTopic topic = new MyTopic(topicName, qos);
 client.subscribe(topic);
 ```
 

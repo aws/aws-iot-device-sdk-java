@@ -76,7 +76,7 @@ of your Maven project.
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
   </dependency>
 </dependencies>
 ```
@@ -88,7 +88,7 @@ The sample applications included with the SDK can also be installed using the fo
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java-samples</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
   </dependency>
 </dependencies>
 ```
@@ -225,10 +225,10 @@ public class MyTopic extends AWSIotTopic {
     }
 }
 
-String topic = "my/own/topic";
+String topicName = "my/own/topic";
 AWSIotQos qos = AWSIotQos.QOS0;
 
-MyTopic topic = new MyTopic(topic, qos);
+MyTopic topic = new MyTopic(topicName, qos);
 client.subscribe(topic);
 ```
 
@@ -425,10 +425,12 @@ through the command line:
 * clientId: client ID
 * thingName: AWS IoT thing name (not required for the Publish/Subscribe sample)
 
-You will also need to private either set of the following arguments for authentication. 
+You will also need to provide either set of the following arguments for authentication.
 For an MQTT connection, provide these arguments: 
 
-* certificateFile: X.509 based certificate file
+* certificateFile: X.509 based certificate file (For Just-in-time registration, this
+is the concatenated file from both the device certificate and CA certificate. For more information
+about Just-in-Time Registration, please see [this blog][Just-in-Time-Registration].
 * privateKeyFile: private key file
 * keyAlgorithm: (optional) RSA or EC. If not specified, RSA is used.
 
@@ -490,3 +492,4 @@ For any other questions about AWS IoT, contact [AWS Support][aws-support].
 [aws-iot-ecc-blog]: https://aws.amazon.com/blogs/iot/elliptic-curve-cryptography-and-forward-secrecy-support-in-aws-iot-3/
 [aws-support]: https://aws.amazon.com/contact-us
 [apache-license-2]: http://www.apache.org/licenses/LICENSE-2.0
+[Just-in-Time-Registration]: https://aws.amazon.com/blogs/iot/just-in-time-registration-of-device-certificates-on-aws-iot/

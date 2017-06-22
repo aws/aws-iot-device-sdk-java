@@ -109,6 +109,7 @@ public class PublishSubscribeSample {
         String privateKeyFile = arguments.get("privateKeyFile", SampleUtil.getConfig("privateKeyFile"));
         if (awsIotClient == null && certificateFile != null && privateKeyFile != null) {
             String algorithm = arguments.get("keyAlgorithm", SampleUtil.getConfig("keyAlgorithm"));
+
             KeyStorePasswordPair pair = SampleUtil.getKeyStorePasswordPair(certificateFile, privateKeyFile, algorithm);
 
             awsIotClient = new AWSIotMqttClient(clientEndpoint, clientId, pair.keyStore, pair.keyPassword);

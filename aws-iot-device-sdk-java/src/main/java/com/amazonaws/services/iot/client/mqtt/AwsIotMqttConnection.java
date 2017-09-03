@@ -146,6 +146,7 @@ public class AwsIotMqttConnection extends AwsIotConnection {
         options.setCleanSession(true);
         options.setConnectionTimeout(client.getConnectionTimeout() / 1000);
         options.setKeepAliveInterval(client.getKeepAliveInterval() / 1000);
+        options.setMaxInflight(client.getMaxInflight());
 
         Set<String> serverUris = getServerUris();
         if (serverUris != null && !serverUris.isEmpty()) {

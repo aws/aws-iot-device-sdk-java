@@ -106,4 +106,9 @@ public class AWSIotConfig {
      */
     public static final int DEVICE_METHOD_ACK_QOS = 0;
 
+    /**
+     * The default value for maximum inflight messages. See also
+     * {@link AWSIotMqttClient#getMaxInflight()}.
+     */
+    public static final int MAX_INFLIGHT = 10;
 }

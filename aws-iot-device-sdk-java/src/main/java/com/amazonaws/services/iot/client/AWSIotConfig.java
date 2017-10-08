@@ -111,4 +111,11 @@ public class AWSIotConfig {
      * {@link AWSIotMqttClient#getMaxInflight()}.
      */
     public static final int MAX_INFLIGHT = 10;
+
+    /**
+     * The default value for automatic reconnect. See
+     * also {@link AWSIotMqttClient#isAutomaticReconnect()}.
+     */
+    public static final boolean CONNECTION_AUTOMATIC_RECONNECT = false;
+
 }

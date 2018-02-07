@@ -33,6 +33,7 @@ import com.amazonaws.services.iot.client.AWSIotQos;
 import com.amazonaws.services.iot.client.AWSIotTimeoutException;
 import com.amazonaws.services.iot.client.AWSIotTopic;
 import com.amazonaws.services.iot.client.shadow.AbstractAwsIotDevice;
+import javax.net.ssl.SSLSocketFactory;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -73,6 +74,17 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
 
         try {
             connection = new AwsIotTlsConnection(this, keyStore, keyPassword);
+        } catch (AWSIotException e) {
+            throw new AwsIotRuntimeException(e);
+        }
+    }
+
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, SSLSocketFactory socketFactory) {
+        this.clientEndpoint = clientEndpoint;
+        this.clientId = clientId;
+        this.connectionType = AwsIotConnectionType.MQTT_OVER_TLS;
+        try {
+            this.connection = new AwsIotTlsConnection(this, socketFactory);
         } catch (AWSIotException e) {
             throw new AwsIotRuntimeException(e);
         }

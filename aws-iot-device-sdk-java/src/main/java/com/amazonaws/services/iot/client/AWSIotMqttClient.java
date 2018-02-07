@@ -15,9 +15,10 @@
 
 package com.amazonaws.services.iot.client;
 
-import java.security.KeyStore;
-
 import com.amazonaws.services.iot.client.core.AbstractAwsIotClient;
+
+import javax.net.ssl.SSLSocketFactory;
+import java.security.KeyStore;
 
 /**
  * This class is the main interface of the AWS IoT Java library. It provides
@@ -128,6 +129,30 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
      */
     public AWSIotMqttClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword) {
         super(clientEndpoint, clientId, keyStore, keyPassword);
+    }
+
+    /**
+     * Instantiates a new client using TLS 1.2 mutual authentication. Client
+     * certificate and private key should be used to initialize the KeyManager
+     * of the socketFactory.
+     *
+     * @param clientEndpoint
+     *            the client endpoint in the form of {@code <account-specific
+     *            prefix>.iot.<aws-region>.amazonaws.com}. The account-specific
+     *            prefix can be found on the AWS IoT console or by using the
+     *            {@code describe-endpoint} command through the AWS command line
+     *            interface.
+     * @param clientId
+     *            the client ID uniquely identify a MQTT connection. Two clients
+     *            with the same client ID are not allowed to be connected
+     *            concurrently to a same endpoint.
+     * @param socketFactory
+     *            A socketFactory instantiated with a Keystore containing the client X.509
+     *            certificate and private key, and a Truststore containing trusted
+     *            Certificate Authorities(CAs).
+     */
+    public AWSIotMqttClient(String clientEndpoint, String clientId, SSLSocketFactory socketFactory) {
+        super(clientEndpoint, clientId, socketFactory);
     }
 
     /**

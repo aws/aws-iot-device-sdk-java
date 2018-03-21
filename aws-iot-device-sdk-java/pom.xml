@@ -40,6 +40,11 @@
       <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
       <version>[1.1.0]</version>
     </dependency>
+    <dependency>
+      <groupId>org.conscrypt</groupId>
+      <artifactId>conscrypt-openjdk-uber</artifactId>
+      <version>1.0.1</version>
+    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>target/generated-sources/delombok</sourceDirectory>

@@ -19,12 +19,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
+import java.security.*;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -33,6 +28,8 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import com.amazonaws.services.iot.client.AWSIotException;
+import org.conscrypt.Conscrypt;
+import org.conscrypt.OpenSSLProvider;
 
 /**
  * This class extends {@link SSLSocketFactory} to enforce TLS v1.2 to be used
@@ -40,6 +37,7 @@ import com.amazonaws.services.iot.client.AWSIotException;
  */
 public class AwsIotTlsSocketFactory extends SSLSocketFactory {
     private static final String TLS_V_1_2 = "TLSv1.2";
+    private static final String[] ALPN_EXTENSION = new String[]{"x-amzn-mqtt-ca"};
 
     /**
      * SSL Socket Factory A SSL socket factory is created and passed into this
@@ -49,7 +47,16 @@ public class AwsIotTlsSocketFactory extends SSLSocketFactory {
 
     public AwsIotTlsSocketFactory(KeyStore keyStore, String keyPassword) throws AWSIotException {
         try {
-            SSLContext context = SSLContext.getInstance(TLS_V_1_2);
+            Security.addProvider(new OpenSSLProvider());
+            SSLContext context;
+
+            try {
+                // Attempt to use Conscrypt
+                context = SSLContext.getInstance(TLS_V_1_2, "Conscrypt");
+            } catch (NoSuchProviderException e) {
+                // Fallback to system SSLContext
+                context = SSLContext.getInstance(TLS_V_1_2);
+            }
 
             KeyManagerFactory managerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             managerFactory.init(keyStore, keyPassword.toCharArray());
@@ -118,6 +125,10 @@ public class AwsIotTlsSocketFactory extends SSLSocketFactory {
     private Socket ensureTls(Socket socket) {
         if (socket != null && (socket instanceof SSLSocket)) {
             ((SSLSocket) socket).setEnabledProtocols(new String[] { TLS_V_1_2 });
+
+            if (Conscrypt.isConscrypt((SSLSocket) socket)) {
+                Conscrypt.setApplicationProtocols((SSLSocket) socket, ALPN_EXTENSION);
+            }
 
             // Ensure hostname is validated againt the CN in the certificate
             SSLParameters sslParams = new SSLParameters();

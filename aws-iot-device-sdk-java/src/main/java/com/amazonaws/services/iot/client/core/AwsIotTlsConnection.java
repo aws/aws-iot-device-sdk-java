@@ -29,7 +29,7 @@ public class AwsIotTlsConnection extends AwsIotMqttConnection {
 
     public AwsIotTlsConnection(AbstractAwsIotClient client, KeyStore keyStore, String keyPassword)
             throws AWSIotException {
-        super(client, new AwsIotTlsSocketFactory(keyStore, keyPassword), "ssl://" + client.getClientEndpoint() + ":8883");
+        super(client, new AwsIotTlsSocketFactory(keyStore, keyPassword), "ssl://" + client.getClientEndpoint() + ":" + client.getClientPort());
     }
 
 }

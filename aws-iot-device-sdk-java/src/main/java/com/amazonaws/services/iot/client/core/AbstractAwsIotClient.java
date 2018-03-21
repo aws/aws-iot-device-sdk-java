@@ -48,6 +48,7 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
 
     protected final String clientId;
     protected final String clientEndpoint;
+    protected final int clientPort;
     protected final AwsIotConnectionType connectionType;
 
     protected int numOfClientThreads = AWSIotConfig.NUM_OF_CLIENT_THREADS;
@@ -67,8 +68,13 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
     private ScheduledExecutorService executionService;
 
     protected AbstractAwsIotClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword) {
+        this(clientEndpoint, 8883, clientId, keyStore, keyPassword);
+    }
+
+    protected AbstractAwsIotClient(String clientEndpoint, int clientPort, String clientId, KeyStore keyStore, String keyPassword) {
         this.clientEndpoint = clientEndpoint;
         this.clientId = clientId;
+        this.clientPort = clientPort;
         this.connectionType = AwsIotConnectionType.MQTT_OVER_TLS;
 
         try {
@@ -82,6 +88,7 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
             String awsSecretAccessKey, String sessionToken) {
         this.clientEndpoint = clientEndpoint;
         this.clientId = clientId;
+        this.clientPort = 443;
         this.connectionType = AwsIotConnectionType.MQTT_OVER_WEBSOCKET;
 
         try {
@@ -91,8 +98,9 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
         }
     }
 
-    AbstractAwsIotClient(String clientEndpoint, String clientId, AwsIotConnection connection) {
+    AbstractAwsIotClient(String clientEndpoint, int clientPort, String clientId, AwsIotConnection connection) {
         this.clientEndpoint = clientEndpoint;
+        this.clientPort = clientPort;
         this.clientId = clientId;
         this.connection = connection;
         this.connectionType = null;

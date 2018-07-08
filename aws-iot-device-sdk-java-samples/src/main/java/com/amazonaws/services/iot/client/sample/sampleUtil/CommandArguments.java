@@ -74,7 +74,7 @@ public class CommandArguments {
     public String getNotNull(String name) {
         String value = get(name);
         if (value == null) {
-            throw new RuntimeException("Missing required argumment for " + name);
+            throw new RuntimeException("Missing required argument for " + name);
         }
         return value;
     }
@@ -82,7 +82,7 @@ public class CommandArguments {
     public String getNotNull(String name, String defaultValue) {
         String value = get(name, defaultValue);
         if (value == null) {
-            throw new RuntimeException("Missing required argumment for " + name);
+            throw new RuntimeException("Missing required argument for " + name);
         }
         return value;
     }

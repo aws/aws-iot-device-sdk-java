@@ -76,7 +76,7 @@ of your Maven project.
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
   </dependency>
 </dependencies>
 ```
@@ -88,7 +88,7 @@ The sample applications included with the SDK can also be installed using the fo
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java-samples</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0</version>
   </dependency>
 </dependencies>
 ```
@@ -321,8 +321,7 @@ public class MyDevice extends AWSIotDevice {
 
 MyDevice device = new MyDevice(thingName);
 
-long reportInterval = 5000;            // milliseconds. Default 
-interval is 3000.
+long reportInterval = 5000;            // milliseconds. Default interval is 3000.
 device.setReportInterval(reportInterval);
 
 client.attach(device);

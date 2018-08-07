@@ -44,7 +44,7 @@ public class AWSIotConfig {
      * The default value for client keep-alive interval (milliseconds). See also
      * {@link AWSIotMqttClient#getKeepAliveInterval()}.
      */
-    public static final int KEEP_ALIVE_INTERVAL = 30000;
+    public static final int KEEP_ALIVE_INTERVAL = 600000;
 
     /**
      * The default value for maximum connection retry times. See also

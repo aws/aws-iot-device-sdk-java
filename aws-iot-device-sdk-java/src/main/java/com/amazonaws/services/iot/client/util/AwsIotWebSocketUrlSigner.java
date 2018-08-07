@@ -60,7 +60,7 @@ public class AwsIotWebSocketUrlSigner {
     /** URI for WebSocket endpoint when doing initial HTTP operation. */
     private static final String CANONICAL_URI = "/mqtt";
     /** endpoint pattern used for validation and extracting region. */
-    private static final Pattern EndpointPattern = Pattern.compile("iot\\.([\\w-]+)\\.amazonaws\\.com(\\:\\d+)?$");
+    private static final Pattern EndpointPattern = Pattern.compile("iot\\.([\\w-]+)\\.amazonaws\\..*");
     /** service name used for signing. */
     private static final String ServiceName = "iotdata";
 

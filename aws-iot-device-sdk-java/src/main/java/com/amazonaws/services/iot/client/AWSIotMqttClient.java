@@ -365,7 +365,7 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
     /**
      * Gets the keep-alive interval for the MQTT connection in milliseconds
      * currently configured. Setting this value to 0 will disable the keep-alive
-     * function for the connection. The default keep alive interval is 30,000ms.
+     * function for the connection. The default keep alive interval is 600,000ms.
      *
      * @return the keep alive interval
      */
@@ -380,7 +380,7 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
      * value to 0 will disable the keep-alive function.
      *
      * @param keepAliveInterval
-     *            the new keep alive interval. The default value is 30,000ms.
+     *            the new keep alive interval. The default value is 600,000ms.
      */
     @Override
     public void setKeepAliveInterval(int keepAliveInterval) {

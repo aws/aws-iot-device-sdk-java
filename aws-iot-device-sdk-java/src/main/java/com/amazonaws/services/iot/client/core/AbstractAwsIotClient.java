@@ -66,6 +66,7 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
     private final AwsIotConnection connection;
 
     private ScheduledExecutorService executionService;
+    private boolean executionServiceOwner = false;
 
     protected AbstractAwsIotClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword,
                                    boolean enableSdkMetrics) {
@@ -141,6 +142,7 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
         synchronized (this) {
             if (executionService == null) {
                 executionService = Executors.newScheduledThreadPool(numOfClientThreads);
+                executionServiceOwner = true;
             }
         }
 
@@ -437,7 +439,9 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
         subscriptions.clear();
         devices.clear();
 
-        executionService.shutdown();
+        if (executionServiceOwner) {
+            executionService.shutdown();
+        }
     }
 
     public Future<?> scheduleTask(Runnable runnable) {

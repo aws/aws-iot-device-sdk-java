@@ -30,6 +30,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This is an example that uses {@link AWSIotMqttClient} to subscribe to a topic and
@@ -73,7 +74,7 @@ public class GreengrassDiscoverySample {
                     try {
                         return SampleUtil.getCertificatesFromInputStream(new ByteArrayInputStream(pem.getBytes())).stream();
                     } catch (CertificateException e) {
-                        return null;
+                        return Stream.empty();
                     }
                 })
                 .collect(Collectors.toList());

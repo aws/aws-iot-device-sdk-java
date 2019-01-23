@@ -23,6 +23,8 @@
             <excludes>
               <exclude>com/amazonaws/services/iot/client/sample/odin/*.java</exclude>
             </excludes>
+              <source>8</source>
+              <target>8</target>
           </configuration>
       </plugin>
       <plugin>

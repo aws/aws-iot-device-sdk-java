@@ -113,20 +113,24 @@ public class SampleUtil {
         return new KeyStorePasswordPair(keyStore, keyPassword);
     }
 
-    private static List<Certificate> loadCertificatesFromFile(final String filename) {
+    public static List<Certificate> loadCertificatesFromFile(final String filename) {
         File file = new File(filename);
         if (!file.exists()) {
             System.out.println("Certificate file: " + filename + " is not found.");
             return null;
         }
 
-        try (BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file))) {
-            final CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-            return (List<Certificate>) certFactory.generateCertificates(stream);
+        try (BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file))) {
+            return getCertificatesFromInputStream(bufferedInputStream);
         } catch (IOException | CertificateException e) {
             System.out.println("Failed to load certificate file " + filename);
         }
         return null;
+    }
+
+    public static List<Certificate> getCertificatesFromInputStream(InputStream inputStream) throws CertificateException {
+        final CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        return (List<Certificate>) certificateFactory.generateCertificates(inputStream);
     }
 
     private static PrivateKey loadPrivateKeyFromFile(final String filename, final String algorithm) {

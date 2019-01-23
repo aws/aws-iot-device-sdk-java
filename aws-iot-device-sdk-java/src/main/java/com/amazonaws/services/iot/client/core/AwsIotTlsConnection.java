@@ -16,6 +16,8 @@
 package com.amazonaws.services.iot.client.core;
 
 import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.util.List;
 
 import com.amazonaws.services.iot.client.AWSIotException;
 import com.amazonaws.services.iot.client.mqtt.AwsIotMqttConnection;
@@ -27,9 +29,9 @@ import com.amazonaws.services.iot.client.util.AwsIotTlsSocketFactory;
  */
 public class AwsIotTlsConnection extends AwsIotMqttConnection {
 
-    public AwsIotTlsConnection(AbstractAwsIotClient client, KeyStore keyStore, String keyPassword)
+    public AwsIotTlsConnection(AbstractAwsIotClient client, KeyStore keyStore, String keyPassword, List<Certificate> trustedCaList)
             throws AWSIotException {
-        super(client, new AwsIotTlsSocketFactory(keyStore, keyPassword), "ssl://" + client.getClientEndpoint() + ":8883");
+        super(client, new AwsIotTlsSocketFactory(keyStore, keyPassword, trustedCaList), "ssl://" + client.getClientEndpoint() + ":8883");
     }
 
 }

@@ -16,6 +16,8 @@
 package com.amazonaws.services.iot.client;
 
 import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.util.List;
 
 import com.amazonaws.services.iot.client.core.AbstractAwsIotClient;
 
@@ -56,13 +58,13 @@ import com.amazonaws.services.iot.client.core.AbstractAwsIotClient;
  * methods in this class are thread-safe, publish and subscribe can be called
  * from different threads.
  * </p>
- * 
+ *
  * <pre>
  * {@code
  *     AWSIotMqttClient client = new AWSIotMqttClient(...);
- *     
+ *
  *     client.connect();
- *     
+ *
  *     ...
  *     client.subscribe(topic, ...)
  *     ...
@@ -81,15 +83,15 @@ import com.amazonaws.services.iot.client.core.AbstractAwsIotClient;
  * provides methods for accessing device shadows directly. Please refer to
  * {@link AWSIotDevice} for more details. A typical flow would be like below.
  * </p>
- * 
+ *
  * <pre>
  * {@code
  *     AWSIotMqttClient client = new AWSIotMqttClient(...);
- *     
+ *
  *     SomeDevice someDevice = new SomeDevice(thingName);    // SomeDevice extends AWSIotDevice
- *     
+ *
  *     client.attach(someDevice);
- *     
+ *
  *     client.connect();
  * }
  * </pre>
@@ -125,9 +127,20 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
      * @param keyPassword
      *            the key password protecting the private key in the
      *            {@code keyStore} argument.
+     * @param trustedCaList
+     *            the CA that should be trusted when establishing the MQTT
+     *            connection. This is NOT in addition to the normal system-wide
+     *            trusted certificates. Normally used with Greengrass discovery.
+     *            Ignored if NULL.
+     *            {@code keyStore} argument.
      */
+    public AWSIotMqttClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword, List<Certificate> trustedCaList) {
+        super(clientEndpoint, clientId, keyStore, keyPassword, trustedCaList);
+    }
+
+    // Same constructor as above but with additonal trusted certificates set to NULL
     public AWSIotMqttClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword) {
-        super(clientEndpoint, clientId, keyStore, keyPassword);
+        super(clientEndpoint, clientId, keyStore, keyPassword, null);
     }
 
     /**
@@ -962,7 +975,7 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
      * respectively. The default implementation for the callback functions in
      * {@link AWSIotTopic} does nothing. The user could override one or more of
      * these functions through subclassing.
-     * 
+     *
      * @param topic
      *            the topic to unsubscribe to
      * @throws AWSIotException

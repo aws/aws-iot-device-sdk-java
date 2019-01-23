@@ -16,6 +16,8 @@
 package com.amazonaws.services.iot.client.core;
 
 import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
@@ -68,22 +70,22 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
     private ScheduledExecutorService executionService;
 
     protected AbstractAwsIotClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword,
-                                   boolean enableSdkMetrics) {
+                                   boolean enableSdkMetrics, List<Certificate> trustedCaList) {
         this.clientEndpoint = clientEndpoint;
         this.clientId = clientId;
         this.connectionType = AwsIotConnectionType.MQTT_OVER_TLS;
         this.clientEnableMetrics = enableSdkMetrics;
 
         try {
-            connection = new AwsIotTlsConnection(this, keyStore, keyPassword);
+            connection = new AwsIotTlsConnection(this, keyStore, keyPassword, trustedCaList);
         } catch (AWSIotException e) {
             throw new AwsIotRuntimeException(e);
         }
     }
 
-    protected AbstractAwsIotClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword) {
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword, List<Certificate> trustedCaList) {
         // Enable Metrics by default
-        this(clientEndpoint, clientId, keyStore, keyPassword, true);
+        this(clientEndpoint, clientId, keyStore, keyPassword, true, trustedCaList);
     }
 
     protected AbstractAwsIotClient(String clientEndpoint, String clientId, String awsAccessKeyId,

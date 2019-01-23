@@ -15,24 +15,17 @@
 
 package com.amazonaws.services.iot.client.util;
 
+import com.amazonaws.services.iot.client.AWSIotException;
+
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLParameters;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-
-import com.amazonaws.services.iot.client.AWSIotException;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.util.List;
 
 /**
  * This class extends {@link SSLSocketFactory} to enforce TLS v1.2 to be used
@@ -47,16 +40,40 @@ public class AwsIotTlsSocketFactory extends SSLSocketFactory {
      */
     private final SSLSocketFactory sslSocketFactory;
 
-    public AwsIotTlsSocketFactory(KeyStore keyStore, String keyPassword) throws AWSIotException {
+    public AwsIotTlsSocketFactory(KeyStore keyStore, String keyPassword, List<Certificate> trustedCaList) throws AWSIotException {
         try {
             SSLContext context = SSLContext.getInstance(TLS_V_1_2);
 
+            TrustManager[] trustManagers = null;
+
+            if (trustedCaList != null) {
+                KeyStore caKeyStore = KeyStore.getInstance("JKS");
+                caKeyStore.load(null, null);
+
+                for (Certificate additionalTrustedCertificate : trustedCaList) {
+                    caKeyStore.setCertificateEntry("", additionalTrustedCertificate);
+                }
+
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+
+                // Get the trust managers for our group CAs
+                // NOTE: Trying to create a list of trust managers that includes the operating system's default trust
+                //         managers will fail. If you receive this exception:
+                //
+                //         javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+                //
+                //         Then it is likely you are using the wrong trust manager or that the certificate has rotated
+                //         and discovery needs to be performed again to get the new group CA.
+                trustManagerFactory.init(caKeyStore);
+                trustManagers = trustManagerFactory.getTrustManagers();
+            }
+
             KeyManagerFactory managerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             managerFactory.init(keyStore, keyPassword.toCharArray());
-            context.init(managerFactory.getKeyManagers(), null, null);
+            context.init(managerFactory.getKeyManagers(), trustManagers, null);
 
             sslSocketFactory = context.getSocketFactory();
-        } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableKeyException | KeyManagementException e) {
+        } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableKeyException | KeyManagementException | IOException | CertificateException e) {
             throw new AWSIotException(e);
         }
     }
@@ -111,13 +128,12 @@ public class AwsIotTlsSocketFactory extends SSLSocketFactory {
      * Enable TLS 1.2 on any socket created by the underlying SSL Socket
      * Factory.
      *
-     * @param socket
-     *            newly created socket which may not have TLS 1.2 enabled.
+     * @param socket newly created socket which may not have TLS 1.2 enabled.
      * @return TLS 1.2 enabled socket.
      */
     private Socket ensureTls(Socket socket) {
         if (socket != null && (socket instanceof SSLSocket)) {
-            ((SSLSocket) socket).setEnabledProtocols(new String[] { TLS_V_1_2 });
+            ((SSLSocket) socket).setEnabledProtocols(new String[]{TLS_V_1_2});
 
             // Ensure hostname is validated againt the CN in the certificate
             SSLParameters sslParams = new SSLParameters();

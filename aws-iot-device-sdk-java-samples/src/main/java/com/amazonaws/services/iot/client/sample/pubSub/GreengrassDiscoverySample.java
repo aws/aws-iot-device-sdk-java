@@ -34,13 +34,13 @@ import java.util.stream.Stream;
 
 /**
  * This is an example that uses {@link AWSIotMqttClient} to subscribe to a topic and
- * publish messages to it. Both blocking and non-blocking publishing are
+ * publish messages to it on a Greengrass Core. Both blocking and non-blocking publishing are
  * demonstrated in this example.
  */
 public class GreengrassDiscoverySample {
     private static final String TestTopic = "sdk/test/java";
     private static final AWSIotQos TestTopicQos = AWSIotQos.QOS0;
-    private GreengrassClient greengrassClient;
+    private AWSIotMqttClient awsIotMqttClient;
     private CommandArguments commandArguments;
 
     public static void main(String args[]) throws Exception {
@@ -50,7 +50,7 @@ public class GreengrassDiscoverySample {
         greengrassDiscoverySample.run(commandArguments);
     }
 
-    private GreengrassClient initAndConnectClient() throws Exception {
+    private AWSIotMqttClient initAndConnectClient() throws Exception {
         String thingName = commandArguments.getNotNull("thingName", SampleUtil.getConfig("thingName"));
         String region = commandArguments.getNotNull("region", SampleUtil.getConfig("region"));
 
@@ -99,20 +99,20 @@ public class GreengrassDiscoverySample {
             // Get the endpoint information as a colon separated string (HOST:PORT)
             String endpoint = greengrassEndpoint.toString();
 
-            GreengrassClient greengrassClient = new GreengrassClient(endpoint, thingName, pair.keyStore, pair.keyPassword, trustedCaList);
+            AWSIotMqttClient awsIotMqttClient = new AWSIotMqttClient(endpoint, thingName, pair.keyStore, pair.keyPassword, trustedCaList);
 
             // Set connection retries to zero so that on a failure the client will disconnect and we will retry discovery
-            greengrassClient.setMaxConnectionRetries(0);
+            awsIotMqttClient.setMaxConnectionRetries(0);
 
             try {
                 // Use a short delay for demo purposes
-                greengrassClient.connect();
+                awsIotMqttClient.connect();
 
                 // Client connected, subscribe to the test topic and return to the caller
                 AWSIotTopic topic = new TestTopicListener(TestTopic, TestTopicQos);
-                greengrassClient.subscribe(topic, true);
+                awsIotMqttClient.subscribe(topic, true);
 
-                return greengrassClient;
+                return awsIotMqttClient;
             } catch (AWSIotException e) {
                 // Client failed to connect, keep checking endpoints
             }
@@ -141,19 +141,19 @@ public class GreengrassDiscoverySample {
         }
     }
 
-    private GreengrassClient getGreengrassClient() throws Exception {
+    private AWSIotMqttClient getAwsIotMqttClient() throws Exception {
         synchronized (this) {
-            if ((greengrassClient != null) && (greengrassClient.getConnectionStatus().equals(AWSIotConnectionStatus.DISCONNECTED))) {
+            if ((awsIotMqttClient != null) && (awsIotMqttClient.getConnectionStatus().equals(AWSIotConnectionStatus.DISCONNECTED))) {
                 System.out.println("Greengrass client disconnected");
-                greengrassClient = null;
+                awsIotMqttClient = null;
             }
 
-            if (greengrassClient == null) {
+            if (awsIotMqttClient == null) {
                 System.out.println("Connecting Greengrass client");
-                greengrassClient = initAndConnectClient();
+                awsIotMqttClient = initAndConnectClient();
             }
 
-            return greengrassClient;
+            return awsIotMqttClient;
         }
     }
 
@@ -166,7 +166,7 @@ public class GreengrassDiscoverySample {
                 String payload = "hello from blocking publisher - " + (counter++);
 
                 try {
-                    getGreengrassClient().publish(TestTopic, payload);
+                    getAwsIotMqttClient().publish(TestTopic, payload);
                 } catch (RuntimeException e) {
                     System.err.println(System.currentTimeMillis() + ": " + e.getMessage());
                 } catch (Exception e) {
@@ -196,7 +196,7 @@ public class GreengrassDiscoverySample {
                 AWSIotMessage message = new NonBlockingPublishListener(TestTopic, TestTopicQos, payload);
 
                 try {
-                    getGreengrassClient().publish(message);
+                    getAwsIotMqttClient().publish(message);
                 } catch (RuntimeException e) {
                     System.err.println(System.currentTimeMillis() + ": " + e.getMessage());
                 } catch (Exception e) {

@@ -120,6 +120,10 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
         this(clientEndpoint, clientId, connection, true);
     }
 
+    public void setUsernameMetricString(String usernameMetricString) {
+        connection.setUsernameMetricString(usernameMetricString);
+    }
+
     public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {
         this.connection.updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
     }

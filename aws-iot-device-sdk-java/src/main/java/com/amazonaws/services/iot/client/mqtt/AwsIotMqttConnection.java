@@ -43,10 +43,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AwsIotMqttConnection extends AwsIotConnection {
-
-    private static final String USERNAME_METRIC_STRING = "?SDK=Java&Version=1.2.0";
     private final SocketFactory socketFactory;
-
+    private String usernameMetricString = null;
     private MqttAsyncClient mqttClient;
     private AwsIotMqttMessageListener messageListener;
     private AwsIotMqttClientListener clientListener;
@@ -147,8 +145,8 @@ public class AwsIotMqttConnection extends AwsIotConnection {
         options.setCleanSession(true);
         options.setConnectionTimeout(client.getConnectionTimeout() / 1000);
         options.setKeepAliveInterval(client.getKeepAliveInterval() / 1000);
-        if(client.isClientEnableMetrics()) {
-            options.setUserName(USERNAME_METRIC_STRING);
+        if (client.isClientEnableMetrics()) {
+            options.setUserName(getUsernameMetricString());
         }
 
         Set<String> serverUris = getServerUris();
@@ -167,4 +165,16 @@ public class AwsIotMqttConnection extends AwsIotConnection {
         return options;
     }
 
+    private String getUsernameMetricString() {
+        if (usernameMetricString == null) {
+            return "?SDK=Java&Version=1.2.0";
+        }
+
+        return usernameMetricString;
+    }
+
+    @Override
+    public void setUsernameMetricString(String usernameMetricString) {
+        this.usernameMetricString = usernameMetricString;
+    }
 }

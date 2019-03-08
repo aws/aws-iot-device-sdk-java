@@ -467,4 +467,5 @@ public abstract class AwsIotConnection implements AwsIotConnectionCallback {
         }, getRetryDelay());
     }
 
+    public abstract void setUsernameMetricString(String usernameMetricString);
 }

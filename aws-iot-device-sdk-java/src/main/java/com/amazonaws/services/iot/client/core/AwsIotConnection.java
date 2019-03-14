@@ -437,7 +437,11 @@ public abstract class AwsIotConnection implements AwsIotConnectionCallback {
      * @return the retry delay
      */
     private long getRetryDelay() {
-        return Math.min(client.getBaseRetryDelay() * (long) Math.pow(2, retryTimes), client.getMaxRetryDelay());
+        if (retryTimes < (Math.log(client.getMaxRetryDelay()) - Math.log(client.getBaseRetryDelay())) / Math.log(2)) {
+            return client.getBaseRetryDelay() * (long) Math.pow(2, retryTimes);
+        } else {
+            return client.getMaxRetryDelay();
+        }
     }
 
     /**

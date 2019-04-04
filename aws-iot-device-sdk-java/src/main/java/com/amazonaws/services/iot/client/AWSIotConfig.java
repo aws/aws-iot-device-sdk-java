@@ -65,6 +65,12 @@ public class AWSIotConfig {
     public static final int CONNECTION_MAX_RETRY_DELAY = 30000;
 
     /**
+     * The default value for clean session connections.
+     * See also {@link AWSIotMqttClient#isCleanSession()}.
+     */
+    public static final boolean CLEAN_SESSION = true;
+
+    /**
      * The default value for maximum offline queue size. See also
      * {@link AWSIotMqttClient#getMaxOfflineQueueSize()}.
      */

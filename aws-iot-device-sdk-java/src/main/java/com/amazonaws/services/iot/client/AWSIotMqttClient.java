@@ -15,9 +15,10 @@
 
 package com.amazonaws.services.iot.client;
 
-import java.security.KeyStore;
-
 import com.amazonaws.services.iot.client.core.AbstractAwsIotClient;
+
+import javax.net.ssl.SSLSocketFactory;
+import java.security.KeyStore;
 
 /**
  * This class is the main interface of the AWS IoT Java library. It provides
@@ -131,6 +132,57 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
     }
 
     /**
+     * Instantiates a new client using TLS 1.2 mutual authentication. Client
+     * certificate and private key should be used to initialize the KeyManager
+     * of the socketFactory.
+     *
+     * @param clientEndpoint
+     *            the client endpoint in the form of {@code <account-specific
+     *            prefix>.iot.<aws-region>.amazonaws.com}. The account-specific
+     *            prefix can be found on the AWS IoT console or by using the
+     *            {@code describe-endpoint} command through the AWS command line
+     *            interface.
+     * @param clientId
+     *            the client ID uniquely identify a MQTT connection. Two clients
+     *            with the same client ID are not allowed to be connected
+     *            concurrently to a same endpoint.
+     * @param socketFactory
+     *            A socketFactory instantiated with a Keystore containing the client X.509
+     *            certificate and private key, and a Truststore containing trusted
+     *            Certificate Authorities(CAs).
+     */
+    public AWSIotMqttClient(String clientEndpoint, String clientId, SSLSocketFactory socketFactory) {
+        super(clientEndpoint, clientId, socketFactory);
+    }
+
+    /**
+     * Instantiates a new client using TLS 1.2 mutual authentication. Client
+     * certificate and private key should be used to initialize the KeyManager
+     * of the socketFactory.
+     *
+     * @param clientEndpoint
+     *            the client endpoint in the form of {@code <account-specific
+     *            prefix>.iot.<aws-region>.amazonaws.com}. The account-specific
+     *            prefix can be found on the AWS IoT console or by using the
+     *            {@code describe-endpoint} command through the AWS command line
+     *            interface.
+     * @param clientId
+     *            the client ID uniquely identify a MQTT connection. Two clients
+     *            with the same client ID are not allowed to be connected
+     *            concurrently to a same endpoint.
+     * @param socketFactory
+     *            A socketFactory instantiated with a Keystore containing the client X.509
+     *            certificate and private key, and a Truststore containing trusted
+     *            Certificate Authorities(CAs).
+     * @param port
+     *            The socket port to use.
+     */
+    public AWSIotMqttClient(String clientEndpoint, String clientId, SSLSocketFactory socketFactory, int port) {
+        super(clientEndpoint, clientId, socketFactory, port);
+    }
+
+    
+    /**
      * Instantiates a new client using Secure WebSocket and AWS SigV4
      * authentication. AWS IAM credentials, including the access key ID and
      * secret access key, are required for signing the request. Credentials can
@@ -184,6 +236,38 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
     public AWSIotMqttClient(String clientEndpoint, String clientId, String awsAccessKeyId, String awsSecretAccessKey,
             String sessionToken) {
         super(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey, sessionToken);
+    }
+
+    /**
+     * Instantiates a new client using Secure WebSocket and AWS SigV4
+     * authentication. AWS IAM credentials, including the access key ID and
+     * secret access key, are required for signing the request. Credentials can
+     * be permanent ones associated with IAM users or temporary ones generated
+     * via the AWS Cognito service.
+     *
+     * @param clientEndpoint
+     *            the client endpoint in the form of
+     *            {@literal <account-specific-prefix>.iot.<region>.amazonaws.com}
+     *            . The account-specific prefix can be found on the AWS IoT
+     *            console or by using the {@code describe-endpoint} command
+     *            through the AWS command line interface.
+     * @param clientId
+     *            the client ID uniquely identify a MQTT connection. Two clients
+     *            with the same client ID are not allowed to be connected
+     *            concurrently to a same endpoint.
+     * @param awsAccessKeyId
+     *            the AWS access key id
+     * @param awsSecretAccessKey
+     *            the AWS secret access key
+     * @param sessionToken
+     *            Session token received along with the temporary credentials
+     *            from services like STS server, AssumeRole, or Amazon Cognito.
+     * @param region
+     *            the AWS region
+     */
+    public AWSIotMqttClient(String clientEndpoint, String clientId, String awsAccessKeyId, String awsSecretAccessKey,
+                            String sessionToken, String region) {
+        super(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey, sessionToken, region);
     }
 
     /**
@@ -430,6 +514,25 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
     public AWSIotMessage getWillMessage() {
         return super.getWillMessage();
     }
+
+    /**
+     * Sets whether the client and server should establish a clean session on each connection.
+     * If false, the server should attempt to persist the client's state between connections.
+     * This must be set before {@link #connect()} is called.
+     *
+     * @param cleanSession
+     *            If true, the server starts a clean session with the client on each connection.
+     *            If false, the server should persist the client's state between connections.
+     */
+    @Override
+    public void setCleanSession(boolean cleanSession) { super.setCleanSession(cleanSession); }
+
+    /**
+     * Gets whether each connection is a clean session. See also {@link #setCleanSession(boolean)}.
+     * @return whether each connection to the server should be a clean session.
+     */
+    @Override
+    public boolean isCleanSession() { return super.isCleanSession(); }
 
     /**
      * Sets a new Last Will and Testament message. The message must be set

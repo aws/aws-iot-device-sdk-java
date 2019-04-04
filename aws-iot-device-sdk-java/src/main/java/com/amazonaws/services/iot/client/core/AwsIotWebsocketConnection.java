@@ -36,15 +36,21 @@ public class AwsIotWebsocketConnection extends AwsIotMqttConnection {
     }
 
     public AwsIotWebsocketConnection(AbstractAwsIotClient client, String awsAccessKeyId, String awsSecretAccessKey,
-            String sessionToken) throws AWSIotException {
+                                     String sessionToken, String region) throws AWSIotException {
         super(client, null, "wss://" + client.getClientEndpoint() + ":443");
 
         // Port number must be included in the endpoint for signing otherwise
         // the signature verification will fail. This is because the Paho client
         // library always includes port number in the host line of the
         // HTTP request header, e.g "Host: data.iot.us-east-1.amazonaws.com:443".
-        urlSigner = new AwsIotWebSocketUrlSigner(client.getClientEndpoint() + ":443");
+        urlSigner = new AwsIotWebSocketUrlSigner(client.getClientEndpoint() + ":443", region);
         urlSigner.updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
+    }
+
+    public AwsIotWebsocketConnection(AbstractAwsIotClient client, String awsAccessKeyId, String awsSecretAccessKey,
+            String sessionToken) throws AWSIotException {
+        //setting the region blank to ensure it's determined from the client Endpoint
+        this(client, awsAccessKeyId, awsSecretAccessKey, sessionToken, "");
     }
 
     @Override

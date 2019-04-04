@@ -63,6 +63,8 @@ public class AwsIotWebSocketUrlSigner {
     private static final Pattern EndpointPattern = Pattern.compile("iot\\.([\\w-]+)\\.amazonaws\\..*");
     /** service name used for signing. */
     private static final String ServiceName = "iotdata";
+    /** Blank region, placeholder until region is determined from the endpoint */
+    private static final String REGION_TO_BE_DETERMINED = "";
 
     private String endpoint;
     private String regionName;
@@ -77,14 +79,28 @@ public class AwsIotWebSocketUrlSigner {
      *            service endpoint with or without customer specific URL prefix.
      */
     public AwsIotWebSocketUrlSigner(String endpoint) {
+        this(endpoint, REGION_TO_BE_DETERMINED);
+    }
+
+    /**
+     * Instantiate a new URL signer with endpoint and region.
+     * @param endpoint service endpoint with or without customer specific URL prefix.
+     * @param region The AWS region
+     */
+    public AwsIotWebSocketUrlSigner(String endpoint, String region) {
         if (endpoint == null) {
             throw new IllegalArgumentException("Invalid endpoint provided");
         }
-
         this.endpoint = endpoint.trim().toLowerCase();
-        this.regionName = getRegionFromEndpoint(this.endpoint);
-        if (this.regionName == null) {
-            throw new IllegalArgumentException("Could not extract region from endpoint provided");
+        if (region == null) {
+            throw new IllegalArgumentException("Invalid region provided");
+        } else if(region.equals(REGION_TO_BE_DETERMINED)) {
+            this.regionName = getRegionFromEndpoint(this.endpoint);
+            if(this.regionName == null) {
+                throw new IllegalArgumentException("Could not extract region from endpoint provided");
+            }
+        } else {
+            this.regionName = region;
         }
     }
 
@@ -103,6 +119,27 @@ public class AwsIotWebSocketUrlSigner {
     public AwsIotWebSocketUrlSigner(String endpoint, String awsAccessKeyId, String awsSecretAccessKey,
             String sessionToken) {
         this(endpoint);
+
+        updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
+    }
+
+    /**
+     * Instantiates a new URL signer instance with endpoint and credentials.
+     *
+     * @param endpoint
+     *            service endpoint with or without customer specific URL prefix.
+     * @param awsAccessKeyId
+     *            AWS access key ID used in SigV4 signature algorithm.
+     * @param awsSecretAccessKey
+     *            AWS secret access key used in SigV4 signature algorithm.
+     * @param sessionToken
+     *            Session token for temporary credentials.
+     * @param region
+     *            The AWS region
+     */
+    public AwsIotWebSocketUrlSigner(String endpoint, String awsAccessKeyId, String awsSecretAccessKey,
+                                    String sessionToken, String region) {
+        this(endpoint,region);
 
         updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
     }
@@ -208,6 +245,13 @@ public class AwsIotWebSocketUrlSigner {
         }
 
         return requestUrl;
+    }
+
+    /**
+     * @return the region this signer is configured to sign against
+     */
+    public String getRegion() {
+        return this.regionName;
     }
 
     private String getRegionFromEndpoint(String endpoint) {

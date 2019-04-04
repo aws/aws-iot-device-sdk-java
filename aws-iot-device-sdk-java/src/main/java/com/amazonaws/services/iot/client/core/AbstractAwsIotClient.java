@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import javax.net.ssl.SSLSocketFactory;
 
 import com.amazonaws.services.iot.client.AWSIotConfig;
 import com.amazonaws.services.iot.client.AWSIotConnectionStatus;
@@ -44,6 +45,8 @@ import lombok.Setter;
 @Setter
 public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
 
+    private static final int DEFAULT_MQTT_PORT = 8883;
+
     private static final Logger LOGGER = Logger.getLogger(AbstractAwsIotClient.class.getName());
 
     protected final String clientId;
@@ -51,6 +54,7 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
     protected final boolean clientEnableMetrics;
     protected final AwsIotConnectionType connectionType;
 
+    protected int port = DEFAULT_MQTT_PORT;
     protected int numOfClientThreads = AWSIotConfig.NUM_OF_CLIENT_THREADS;
     protected int connectionTimeout = AWSIotConfig.CONNECTION_TIMEOUT;
     protected int serverAckTimeout = AWSIotConfig.SERVER_ACK_TIMEOUT;
@@ -59,6 +63,7 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
     protected int baseRetryDelay = AWSIotConfig.CONNECTION_BASE_RETRY_DELAY;
     protected int maxRetryDelay = AWSIotConfig.CONNECTION_MAX_RETRY_DELAY;
     protected int maxOfflineQueueSize = AWSIotConfig.MAX_OFFLINE_QUEUE_SIZE;
+    protected boolean cleanSession = AWSIotConfig.CLEAN_SESSION;
     protected AWSIotMessage willMessage;
 
     private final ConcurrentMap<String, AWSIotTopic> subscriptions = new ConcurrentHashMap<>();
@@ -80,7 +85,7 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
             throw new AwsIotRuntimeException(e);
         }
     }
-
+    
     protected AbstractAwsIotClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword) {
         // Enable Metrics by default
         this(clientEndpoint, clientId, keyStore, keyPassword, true);
@@ -88,13 +93,20 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
 
     protected AbstractAwsIotClient(String clientEndpoint, String clientId, String awsAccessKeyId,
                                    String awsSecretAccessKey, String sessionToken, boolean enableSdkMetrics) {
+        //setting the region blank to ensure it's determined from the clientEndpoint
+        this(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey, sessionToken, "", enableSdkMetrics);
+    }
+
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, String awsAccessKeyId,
+                                   String awsSecretAccessKey, String sessionToken,
+                                   String region, boolean enableSdkMetrics) {
         this.clientEndpoint = clientEndpoint;
         this.clientId = clientId;
         this.connectionType = AwsIotConnectionType.MQTT_OVER_WEBSOCKET;
         this.clientEnableMetrics = enableSdkMetrics;
 
         try {
-            connection = new AwsIotWebsocketConnection(this, awsAccessKeyId, awsSecretAccessKey, sessionToken);
+            connection = new AwsIotWebsocketConnection(this, awsAccessKeyId, awsSecretAccessKey, sessionToken, region);
         } catch (AWSIotException e) {
             throw new AwsIotRuntimeException(e);
         }
@@ -104,6 +116,12 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
                                    String awsSecretAccessKey, String sessionToken) {
         // Enable Metrics by default
         this(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey, sessionToken, true);
+    }
+
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, String awsAccessKeyId,
+                                   String awsSecretAccessKey, String sessionToken, String region) {
+        // Enable Metrics by default
+        this(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey, sessionToken, region, true);
     }
 
     AbstractAwsIotClient(String clientEndpoint, String clientId, AwsIotConnection connection,
@@ -118,6 +136,41 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
     AbstractAwsIotClient(String clientEndpoint, String clientId, AwsIotConnection connection) {
         // Enable Metrics by default
         this(clientEndpoint, clientId, connection, true);
+    }
+
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, SSLSocketFactory socketFactory, boolean enableSdkMetrics) {
+        this.clientEndpoint = clientEndpoint;
+        this.clientId = clientId;
+        this.connectionType = null;
+        this.clientEnableMetrics = enableSdkMetrics;
+
+        try {
+            this.connection = new AwsIotTlsConnection(this, socketFactory);
+        } catch (AWSIotException e) {
+            throw new AwsIotRuntimeException(e);
+        }
+    }
+
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, SSLSocketFactory socketFactory) {
+        this(clientEndpoint, clientId, socketFactory, true);
+    }
+
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, SSLSocketFactory socketFactory, int port, boolean enableSdkMetrics) {
+        this.clientEndpoint = clientEndpoint;
+        this.clientId = clientId;
+        this.connectionType = AwsIotConnectionType.MQTT_OVER_TLS;
+        this.port = port;
+        this.clientEnableMetrics = enableSdkMetrics;
+
+        try {
+            this.connection = new AwsIotTlsConnection(this, socketFactory);
+        } catch (AWSIotException e) {
+            throw new AwsIotRuntimeException(e);
+        }
+    }
+
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, SSLSocketFactory socketFactory, int port) {
+        this(clientEndpoint, clientId, socketFactory, port, true);
     }
 
     public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {

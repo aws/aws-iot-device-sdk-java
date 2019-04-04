@@ -44,7 +44,7 @@ import lombok.Setter;
 @Setter
 public class AwsIotMqttConnection extends AwsIotConnection {
 
-    private static final String USERNAME_METRIC_STRING = "?SDK=Java&Version=1.2.0";
+    private static final String USERNAME_METRIC_STRING = "?SDK=Java&Version=1.3.0";
     private final SocketFactory socketFactory;
 
     private MqttAsyncClient mqttClient;
@@ -144,7 +144,7 @@ public class AwsIotMqttConnection extends AwsIotConnection {
         MqttConnectOptions options = new MqttConnectOptions();
 
         options.setSocketFactory(socketFactory);
-        options.setCleanSession(true);
+        options.setCleanSession(client.isCleanSession());
         options.setConnectionTimeout(client.getConnectionTimeout() / 1000);
         options.setKeepAliveInterval(client.getKeepAliveInterval() / 1000);
         if(client.isClientEnableMetrics()) {

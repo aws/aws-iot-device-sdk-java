@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java-pom</artifactId>
-    <version>1.3.1</version>
+    <version>1.3.2</version>
   </parent>
   <artifactId>aws-iot-device-sdk-java</artifactId>
   <dependencies>
@@ -22,18 +22,18 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.16.8</version>
+      <version>1.18.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.9.6</version>
+      <version>2.9.9</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.9.6</version>
+      <version>2.9.9</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.paho</groupId>
@@ -57,7 +57,7 @@
       <plugin>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok-maven-plugin</artifactId>
-        <version>1.16.8.0</version>
+        <version>1.18.6.0</version>
         <executions>
           <execution>
             <phase>generate-sources</phase>

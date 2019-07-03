@@ -35,7 +35,7 @@ import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateCrtKeySpec;
 
-import javax.xml.bind.DatatypeConverter;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * Class for reading RSA or ECC private key from PEM file.
@@ -128,7 +128,7 @@ public class PrivateKeyReader {
             }
         }
         KeySpec keySpec = null;
-        byte[] encoded = DatatypeConverter.parseBase64Binary(builder.toString());
+        byte[] encoded = Base64.decodeBase64(builder.toString());
         if (isRSAKey) {
             keySpec = getRSAKeySpec(encoded);
         } else {

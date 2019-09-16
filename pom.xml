@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.amazonaws</groupId>
   <artifactId>aws-iot-device-sdk-java-pom</artifactId>
-  <version>1.3.2</version>
+  <version>1.3.3</version>
   <packaging>pom</packaging>
   <name>AWS IoT Device SDK for Java</name>
   <description>The AWS IoT Device SDK for Java provides Java APIs for devices to connect to AWS IoT service using the MQTT protocol. The SDK also provides support for AWS IoT specific features, such as Thing Shadow and Thing Shadow abstraction.</description>

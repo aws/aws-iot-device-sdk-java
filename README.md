@@ -217,7 +217,8 @@ To subscribe to a topic:
 public class MyTopic extends AWSIotTopic {
     public MyTopic(String topic, AWSIotQos qos) {
         super(topic, qos);
-    }
+    }on a  nice good project
+ 
 
     @Override
     public void onMessage(AWSIotMessage message) {
@@ -401,94 +402,4 @@ dependencies.
 
 * Publish/Subscribe sample:
 This sample consists of two publishers publishing one message per second to a 
-topic. One subscriber subscribing to the same topic receives and prints the 
-messages. 
-
-* Shadow sample:
-This sample consists of a simple demo of the simplified shadow access 
-model. The device contains two attributes: window state and room temperature. 
-Window state can be modified (therefore, controlled) remotely through 
-***desired*** state. To demonstrate this control function, you can use the AWS 
-IoT console to modify the desired window state, and then see its change from the
-sample output.
-
-* Shadow echo sample: 
-This sample consists of a simple demo that uses Shadow methods to send a shadow 
-update and then retrieve it back every second.
-
-### Arguments for the Sample Applications
-To run the samples, you will also need to provide the following arguments 
-through the command line:
-
-* clientEndpoint: client endpoint, in the form of ```<prefix>.iot.<region>.amazonaws.com```
-* clientId: client ID
-* thingName: AWS IoT thing name (not required for the Publish/Subscribe sample)
-
-You will also need to provide either set of the following arguments for authentication.
-For an MQTT connection, provide these arguments: 
-
-* certificateFile: X.509 based certificate file (For Just-in-time registration, this
-is the concatenated file from both the device certificate and CA certificate. For more information
-about Just-in-Time Registration, please see [this blog][Just-in-Time-Registration].
-* privateKeyFile: private key file
-* keyAlgorithm: (optional) RSA or EC. If not specified, RSA is used.
-
-For an MQTT over WebSocket connection, provide these arguments: 
-
-* awsAccessKeyId: IAM access key ID
-* awsSecretAccessKey: IAM secret access key
-* sessionToken: (optional) if temporary credentials are used
-
-### Run the Sample Applications
-You can use the following commands to execute the sample applications (assuming 
-TLS mutual authentication is used).
-
-* To run the Publish/Subscribe sample, use the following command:
-```sh
-$ mvn exec:java -pl aws-iot-device-sdk-java-samples -Dexec.mainClass="com.amazonaws.services.iot.client.sample.pubSub.PublishSubscribeSample" -Dexec.args="-clientEndpoint <prefix>.iot.<region>.amazonaws.com -clientId <unique client id> -certificateFile <certificate file> -privateKeyFile <private key file>"
-```
-
-* To run the Shadow sample, use the following command:
-```sh
-$ mvn exec:java -pl aws-iot-device-sdk-java-samples -Dexec.mainClass="com.amazonaws.services.iot.client.sample.shadow.ShadowSample" -Dexec.args="-clientEndpoint <prefix>.iot.<region>.amazonaws.com -clientId <unique client id> -thingName <thing name> -certificateFile <certificate file> -privateKeyFile <private key file>"
-```
-
-* To run the Shadow echo sample, use the following command: 
-```sh
-$ mvn exec:java -pl aws-iot-device-sdk-java-samples -Dexec.mainClass="com.amazonaws.services.iot.client.sample.shadowEcho.ShadowEchoSample" -Dexec.args="-clientEndpoint <prefix>.iot.<region>.amazonaws.com -clientId <unique client id> -thingName <thing name> -certificateFile <certificate file> -privateKeyFile <private key file>"
-```
-
-### Sample Source Code
-You can get the sample source code either from the GitHub repository as described 
-[here](#build-the-sdk-from-the-github-source) or from [the latest SDK binary][latest-jar].
-They both provide you with Maven project files that you can use to build and run the samples
-from the command line or import them into an IDE, such as Eclipse.
-
-The sample source code included with the latest SDK binary is shipped with a modified Maven
-project file (pom.xml) that allows you to build the sample source indepedently, without the
-need to reference the parent POM file as with the GitHub source tree. 
-
-## API Documentation
-You'll find the API documentation for the SDK [here][api-docs].
-
-## License
-This SDK is distributed under the [Apache License, Version 2.0][apache-license-2]. For more information, see
-LICENSE.txt and NOTICE.txt.
-
-## Support
-If you have technical questions about the AWS IoT Device SDK, use the [AWS IoT Forum][aws-iot-forum].
-For any other questions about AWS IoT, contact [AWS Support][aws-support].
-
-[aws-iot-protocol]: http://docs.aws.amazon.com/iot/latest/developerguide/protocols.html
-[aws-iot-thing]: http://docs.aws.amazon.com/iot/latest/developerguide/iot-thing-shadows.html
-[aws-iot-forum]: https://forums.aws.amazon.com/forum.jspa?forumID=210
-[aws-iot-console]: http://aws.amazon.com/iot/
-[latest-jar]: https://s3.amazonaws.com/aws-iot-device-sdk-java/aws-iot-device-sdk-java-LATEST.zip
-[jackson-core]: https://github.com/FasterXML/jackson-core
-[jackson-databind]: https://github.com/FasterXML/jackson-databind
-[paho-mqtt-java-download]: https://eclipse.org/paho/clients/java/
-[api-docs]: http://aws-iot-device-sdk-java-docs.s3-website-us-east-1.amazonaws.com/
-[aws-iot-ecc-blog]: https://aws.amazon.com/blogs/iot/elliptic-curve-cryptography-and-forward-secrecy-support-in-aws-iot-3/
-[aws-support]: https://aws.amazon.com/contact-us
-[apache-license-2]: http://www.apache.org/licenses/LICENSE-2.0
-[Just-in-Time-Registration]: https://aws.amazon.com/blogs/iot/just-in-time-registration-of-device-certificates-on-aws-iot/
+topic. One subscriber subscribing to the https://github.com/aws/aws-iot-device-sdk-java

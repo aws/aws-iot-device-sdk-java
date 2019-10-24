@@ -328,6 +328,45 @@ client.attach(device);
 client.connect();
 ```
 
+### DiscoveryInfoProvider
+
+This is the client class for device discovery process with AWS IoT Greengrass. You can initialize and configure the client like this:
+
+```java
+import com.amazonaws.services.iot.client.greengrass.DiscoveryInfoProvider;
+
+String clientEndpoint = "<prefix>.iot.<region>.amazonaws.com";       // replace <prefix> and <region> with your own
+String thingName = "<thing name>";                                   // replace with your AWS IoT Thing name
+String certificateFile = "<certificate file>";                       // X.509 based certificate file
+String privateKeyFile = "<private key file>";                        // PKCS#1 or PKCS#8 PEM encoded private key file
+
+// SampleUtil.java and its dependency PrivateKeyReader.java can be copied from the sample source code.
+// Alternatively, you could load key store directly from a file - see the example included in this README.
+KeyStorePasswordPair pair = SampleUtil.getKeyStorePasswordPair(certificateFile, privateKeyFile);
+DiscoveryInfoProvider discoveryInfoProvider = new DiscoveryInfoProvider(clientEndpoint, pair.keyStore, pair.keyPassword);
+```
+
+To perform the discovery process for a Greengrass Aware Device (GGAD) that belongs to a deployed group, your code should look like this:
+
+```java
+DiscoveryInfo discoveryInfo = discoveryInfoProvider.discover(thingName);
+
+// I know nothing about the group/core I want to connect to. I want to iterate through all cores and find out.
+List<CoreConnectivityInfo> cores = discoveryInfo.getAllCores();
+List<Certificate> trustedCAs = discoveryInfo.getAllCas();
+
+// Connecting logic ...
+ConnectivityInfo connectivityInfo = cores.get(0).getConnectivity().get(0);
+String coreEndpoint = connectivityInfo.getHostAddress() + ":" + connectivityInfo.getPortNumber();
+
+AWSIotMqttClient client = new AWSIotMqttClient(coreEndpoint, thingName, pair.keyStore, pair.keyPassword, trustedCAs);
+client.connect();
+```
+For more information about discovery information access at group/core/connectivity info set level, 
+please refer to the API documentation for `com.amazonaws.services.iot.client.greengrass.*`, 
+[Greengrass Discovery documentation](http://docs.aws.amazon.com/greengrass/latest/developerguide/gg-discover-api.html) or 
+[Greengrass overall documentation](http://docs.aws.amazon.com/greengrass/latest/developerguide/what-is-gg.html).
+
 ### Other Topics 
 #### Enable Logging
 The SDK uses ```java.util.logging``` for logging. To change

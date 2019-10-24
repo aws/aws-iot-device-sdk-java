@@ -38,6 +38,9 @@ import com.amazonaws.services.iot.client.shadow.AbstractAwsIotDevice;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.security.cert.Certificate;
+import java.util.List;
+
 /**
  * The actual implementation of {@code AWSIotMqttClient}.
  */
@@ -73,22 +76,23 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
     private ScheduledExecutorService executionService;
 
     protected AbstractAwsIotClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword,
-                                   boolean enableSdkMetrics) {
+                                   List<Certificate> trustedCaList, boolean enableSdkMetrics) {
         this.clientEndpoint = clientEndpoint;
         this.clientId = clientId;
         this.connectionType = AwsIotConnectionType.MQTT_OVER_TLS;
         this.clientEnableMetrics = enableSdkMetrics;
 
         try {
-            connection = new AwsIotTlsConnection(this, keyStore, keyPassword);
+            connection = new AwsIotTlsConnection(this, keyStore, keyPassword, trustedCaList);
         } catch (AWSIotException e) {
             throw new AwsIotRuntimeException(e);
         }
     }
-    
-    protected AbstractAwsIotClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword) {
+
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, KeyStore keyStore, String keyPassword,
+                                   List<Certificate> trustedCaList) {
         // Enable Metrics by default
-        this(clientEndpoint, clientId, keyStore, keyPassword, true);
+        this(clientEndpoint, clientId, keyStore, keyPassword, trustedCaList, true);
     }
 
     protected AbstractAwsIotClient(String clientEndpoint, String clientId, String awsAccessKeyId,

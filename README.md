@@ -1,3 +1,7 @@
+## New Version Available in Developer Preview
+
+A preview of the new AWS IoT Device SDK is [now available](https://github.com/awslabs/aws-iot-device-sdk-java-v2). It is a complete rework, built to improve reliability, performance, and security. We invite your feedback!
+
 # AWS IoT Device SDK for Java
 The **AWS IoT Device SDK for Java** enables Java developers to access the AWS 
 IoT Platform through [MQTT or MQTT over the WebSocket protocol][aws-iot-protocol]. 

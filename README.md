@@ -136,7 +136,7 @@ and RSA keys are required. You can use the
 only a certificate file and private key file are required.
 
 ```java
-String clientEndpoint = "<prefix>-ats.iot.<region>.amazonaws.com";   // use value returned by describe-endpoint --endpoint-type
+String clientEndpoint = "<prefix>-ats.iot.<region>.amazonaws.com";   // use value returned by describe-endpoint --endpoint-type "iot:Data-ATS"
 String clientId = "<unique client id>";                              // replace with your own client ID. Use unique client IDs for concurrent connections.
 String certificateFile = "<certificate file>";                       // X.509 based certificate file
 String privateKeyFile = "<private key file>";                        // PKCS#1 or PKCS#8 PEM encoded private key file

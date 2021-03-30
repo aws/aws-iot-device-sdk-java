@@ -90,8 +90,6 @@ public class AwsIotWebSocketUrlSigner {
      * Instantiate a new URL signer with endpoint and region.
      * @param endpoint service endpoint with or without customer specific URL prefix.
      * @param region The AWS region
-     *
-     * @Deprecated use provider-based constructor
      */
     public AwsIotWebSocketUrlSigner(String endpoint, String region) {
         if (endpoint == null) {
@@ -150,8 +148,6 @@ public class AwsIotWebSocketUrlSigner {
      *            AWS secret access key used in SigV4 signature algorithm.
      * @param sessionToken
      *            Session token for temporary credentials.
-     *
-     * @Deprecated use provider-based constructor
      */
     public AwsIotWebSocketUrlSigner(String endpoint, String awsAccessKeyId, String awsSecretAccessKey,
             String sessionToken) {
@@ -173,8 +169,6 @@ public class AwsIotWebSocketUrlSigner {
      *            Session token for temporary credentials.
      * @param region
      *            The AWS region
-     *
-     * @Deprecated use provider-based constructor
      */
     public AwsIotWebSocketUrlSigner(String endpoint, String awsAccessKeyId, String awsSecretAccessKey,
                                     String sessionToken, String region) {
@@ -203,8 +197,6 @@ public class AwsIotWebSocketUrlSigner {
      *            AWS secret access key used in SigV4 signature algorithm.
      * @param sessionToken
      *            Session token for temporary credentials.
-     *
-     * @Deprecated use session/caching-aware credentials providers
      */
     public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {
         if (awsAccessKeyId == null || awsSecretAccessKey == null) {

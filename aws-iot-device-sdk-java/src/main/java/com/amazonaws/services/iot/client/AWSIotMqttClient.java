@@ -204,7 +204,10 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
      *            the AWS access key id
      * @param awsSecretAccessKey
      *            the AWS secret access key
+     *
+     * @deprecated prefer a constructor based on {@link CredentialsProvider}.
      */
+    @Deprecated
     public AWSIotMqttClient(String clientEndpoint, String clientId, String awsAccessKeyId, String awsSecretAccessKey) {
         super(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey, null);
     }
@@ -233,7 +236,10 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
      * @param sessionToken
      *            Session token received along with the temporary credentials
      *            from services like STS server, AssumeRole, or Amazon Cognito.
+     *
+     * @deprecated prefer a constructor based on {@link CredentialsProvider}.
      */
+    @Deprecated
     public AWSIotMqttClient(String clientEndpoint, String clientId, String awsAccessKeyId, String awsSecretAccessKey,
             String sessionToken) {
         super(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey, sessionToken);
@@ -265,7 +271,10 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
      *            from services like STS server, AssumeRole, or Amazon Cognito.
      * @param region
      *            the AWS region
+     *
+     * @deprecated prefer a constructor based on {@link CredentialsProvider}.
      */
+    @Deprecated
     public AWSIotMqttClient(String clientEndpoint, String clientId, String awsAccessKeyId, String awsSecretAccessKey,
                             String sessionToken, String region) {
         super(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey, sessionToken, region);
@@ -311,8 +320,9 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
      *            Session token received along with the temporary credentials
      *            from services like STS server, AssumeRole, or Amazon Cognito.
      *
-     * @deprecated prefer a session/caching aware credentials provider
+     * @deprecated prefer building the client with a session/caching-aware {@link CredentialsProvider}.
      */
+    @Deprecated
     @Override
     public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {
         super.updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);

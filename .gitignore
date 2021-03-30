@@ -1,0 +1,4 @@
+.idea
+*.iml
+aws-iot-device-sdk-java-samples/target/
+aws-iot-device-sdk-java/target/

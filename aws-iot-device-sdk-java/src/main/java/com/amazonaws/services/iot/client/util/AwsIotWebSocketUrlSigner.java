@@ -310,7 +310,8 @@ public class AwsIotWebSocketUrlSigner {
 
     /**
      * @return the region this signer is configured to sign against
-     */    public String getRegion() {
+     */
+    public String getRegion() {
         return this.regionName;
     }
 

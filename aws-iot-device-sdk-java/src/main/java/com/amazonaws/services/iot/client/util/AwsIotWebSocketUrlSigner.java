@@ -359,10 +359,6 @@ public class AwsIotWebSocketUrlSigner {
             throw new AWSIotException("Error in initializing signing secret MAC");
         }
 
-        if (signingSecretMac == null) {
-            throw new AWSIotException("Failure to initialize signing Mac");
-        }
-
         // AWS4 uses a series of derived keys, formed by hashing different
         // pieces of data
         byte[] signingDate = sign(dateStamp, signingSecretMac);

@@ -31,6 +31,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.amazonaws.services.iot.client.auth.Credentials;
 import com.amazonaws.services.iot.client.auth.CredentialsProvider;
+import com.amazonaws.services.iot.client.auth.StaticCredentialsProvider;
 import com.amazonaws.services.iot.client.AWSIotException;
 
 /**
@@ -133,7 +134,7 @@ public class AwsIotWebSocketUrlSigner {
         }
 
         if (provider == null) {
-            throw new IllegalArgument("Invalid credentials provider");
+            throw new IllegalArgumentException("Invalid credentials provider");
         }
         this.credentialsProvider = provider;
     }
@@ -297,7 +298,11 @@ public class AwsIotWebSocketUrlSigner {
         // append the session token to the end of the URL string after signing.
         String sessionToken = credentials.getSessionToken();
         if (sessionToken != null) {
-            requestUrl += "&X-Amz-Security-Token=" + URLEncoder.encode(sessionToken, UTF8);
+            try {
+                requestUrl += "&X-Amz-Security-Token=" + URLEncoder.encode(sessionToken, UTF8);
+            } catch (UnsupportedEncodingException e) {
+                throw new AWSIotException(e);
+            }
         }
 
         return requestUrl;

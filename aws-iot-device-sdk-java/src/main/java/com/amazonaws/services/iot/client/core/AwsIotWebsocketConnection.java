@@ -18,6 +18,7 @@ package com.amazonaws.services.iot.client.core;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.amazonaws.services.iot.client.auth.CredentialsProvider;
 import com.amazonaws.services.iot.client.AWSIotException;
 import com.amazonaws.services.iot.client.mqtt.AwsIotMqttConnection;
 import com.amazonaws.services.iot.client.util.AwsIotWebSocketUrlSigner;

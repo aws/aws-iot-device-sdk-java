@@ -29,6 +29,8 @@ import java.util.regex.Pattern;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.amazonaws.services.iot.client.auth.Credentials;
+import com.amazonaws.services.iot.client.auth.CredentialsProvider;
 import com.amazonaws.services.iot.client.AWSIotException;
 
 /**
@@ -68,15 +70,16 @@ public class AwsIotWebSocketUrlSigner {
 
     private String endpoint;
     private String regionName;
-    private String awsAccessKeyId;
-    private String sessionToken;
-    private Mac signingSecretMac;
+
+    private CredentialsProvider credentialsProvider;
 
     /**
      * Instantiates a new URL signer instance with endpoint only.
      *
      * @param endpoint
      *            service endpoint with or without customer specific URL prefix.
+     *
+     * @Deprecated use provider-based constructor
      */
     public AwsIotWebSocketUrlSigner(String endpoint) {
         this(endpoint, REGION_TO_BE_DETERMINED);
@@ -86,6 +89,8 @@ public class AwsIotWebSocketUrlSigner {
      * Instantiate a new URL signer with endpoint and region.
      * @param endpoint service endpoint with or without customer specific URL prefix.
      * @param region The AWS region
+     *
+     * @Deprecated use provider-based constructor
      */
     public AwsIotWebSocketUrlSigner(String endpoint, String region) {
         if (endpoint == null) {
@@ -105,6 +110,35 @@ public class AwsIotWebSocketUrlSigner {
     }
 
     /**
+     * Instantiate a new URL signer with endpoint, region and source of credentials
+     * @param endpoint service endpoint with or without customer specific URL prefix.
+     * @param provider credentials provider to source AWS credentials from
+     * @param region The AWS region
+     *
+     */
+    public AwsIotWebSocketUrlSigner(String endpoint, CredentialsProvider provider, String region) {
+        if (endpoint == null) {
+            throw new IllegalArgumentException("Invalid endpoint provided");
+        }
+        this.endpoint = endpoint.trim().toLowerCase();
+        if (region == null) {
+            throw new IllegalArgumentException("Invalid region provided");
+        } else if(region.equals(REGION_TO_BE_DETERMINED)) {
+            this.regionName = getRegionFromEndpoint(this.endpoint);
+            if(this.regionName == null) {
+                throw new IllegalArgumentException("Could not extract region from endpoint provided");
+            }
+        } else {
+            this.regionName = region;
+        }
+
+        if (provider == null) {
+            throw new IllegalArgument("Invalid credentials provider");
+        }
+        this.credentialsProvider = provider;
+    }
+
+    /**
      * Instantiates a new URL signer instance with endpoint and credentials.
      *
      * @param endpoint
@@ -115,6 +149,8 @@ public class AwsIotWebSocketUrlSigner {
      *            AWS secret access key used in SigV4 signature algorithm.
      * @param sessionToken
      *            Session token for temporary credentials.
+     *
+     * @Deprecated use provider-based constructor
      */
     public AwsIotWebSocketUrlSigner(String endpoint, String awsAccessKeyId, String awsSecretAccessKey,
             String sessionToken) {
@@ -136,12 +172,25 @@ public class AwsIotWebSocketUrlSigner {
      *            Session token for temporary credentials.
      * @param region
      *            The AWS region
+     *
+     * @Deprecated use provider-based constructor
      */
     public AwsIotWebSocketUrlSigner(String endpoint, String awsAccessKeyId, String awsSecretAccessKey,
                                     String sessionToken, String region) {
         this(endpoint,region);
 
         updateCredentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
+    }
+
+    /**
+     * Updates the provider used by the signer.  Only exists to support deprecated credential replacement API.
+     *
+     * @param provider
+     */
+    private void updateCredentialsProvider(CredentialsProvider provider) {
+        synchronized (this) {
+            credentialsProvider = provider;
+        }
     }
 
     /**
@@ -153,28 +202,18 @@ public class AwsIotWebSocketUrlSigner {
      *            AWS secret access key used in SigV4 signature algorithm.
      * @param sessionToken
      *            Session token for temporary credentials.
+     *
+     * @Deprecated use session/caching-aware credentials providers
      */
     public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {
         if (awsAccessKeyId == null || awsSecretAccessKey == null) {
             throw new IllegalArgumentException("Missing required data for signing");
         }
 
-        this.awsAccessKeyId = awsAccessKeyId.trim();
+        Credentials credentials = new Credentials(awsAccessKeyId, awsSecretAccessKey, sessionToken);
+        CredentialsProvider provider = new StaticCredentialsProvider(credentials);
 
-        try {
-            // secret key is stored as a hash in memory to prevent key leaking
-            // from memory dump
-            byte[] signingSecret = (KEY_PREFIX + awsSecretAccessKey).getBytes(UTF8);
-            this.signingSecretMac = Mac.getInstance(HMAC_ALGORITHM);
-            this.signingSecretMac.init(new SecretKeySpec(signingSecret, HMAC_ALGORITHM));
-
-            this.sessionToken = sessionToken;
-            if (this.sessionToken != null) {
-                this.sessionToken = URLEncoder.encode(this.sessionToken, UTF8);
-            }
-        } catch (UnsupportedEncodingException | NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new IllegalArgumentException("Error in initializing signing secret MAC");
-        }
+        updateCredentialsProvider(provider);
     }
 
     /**
@@ -190,6 +229,22 @@ public class AwsIotWebSocketUrlSigner {
      *             information.
      */
     public String getSignedUrl(final Date signingDate) throws AWSIotException {
+        CredentialsProvider provider = null;
+        synchronized (this) {
+            provider = credentialsProvider;
+        }
+
+        if (provider == null) {
+            throw new AWSIotException("No credentials provider available for signing");
+        }
+
+        Credentials credentials = provider.getCredentials();
+        if (credentials == null) {
+            throw new AWSIotException("Could not source AWS credentials from provider");
+        }
+
+        String awsAccessKeyId = credentials.getAccessKeyId();
+
         Date dateToUse = signingDate;
         if (dateToUse == null) {
             dateToUse = new Date();
@@ -225,7 +280,7 @@ public class AwsIotWebSocketUrlSigner {
         // Create a string to sign, generate a signing key...
         String stringToSign = ALGORITHM + "\n" + amzDate + "\n" + credentialScope + "\n"
                 + stringToHex(hash(canonicalRequest));
-        byte[] signingKey = getSigningKey(dateStamp);
+        byte[] signingKey = getSigningKey(credentials, dateStamp);
         // ...and sign the string.
         byte[] signatureBytes = sign(stringToSign, signingKey);
         String signature = stringToHex(signatureBytes);
@@ -240,8 +295,9 @@ public class AwsIotWebSocketUrlSigner {
         // If there are session credentials (from an STS server, AssumeRole, or
         // Amazon Cognito),
         // append the session token to the end of the URL string after signing.
+        String sessionToken = credentials.getSessionToken();
         if (sessionToken != null) {
-            requestUrl += "&X-Amz-Security-Token=" + sessionToken;
+            requestUrl += "&X-Amz-Security-Token=" + URLEncoder.encode(sessionToken, UTF8);
         }
 
         return requestUrl;
@@ -249,8 +305,7 @@ public class AwsIotWebSocketUrlSigner {
 
     /**
      * @return the region this signer is configured to sign against
-     */
-    public String getRegion() {
+     */    public String getRegion() {
         return this.regionName;
     }
 
@@ -295,10 +350,21 @@ public class AwsIotWebSocketUrlSigner {
      * @return byte array containing the SigV4 signing key.
      * @throws AWSIotException
      */
-    private byte[] getSigningKey(String dateStamp) throws AWSIotException {
-        if (signingSecretMac == null) {
-            throw new AWSIotException("Signing credentials not provided");
+    private byte[] getSigningKey(Credentials credentials, String dateStamp) throws AWSIotException {
+
+        Mac signingSecretMac = null;
+        try {
+            byte[] signingSecret = (KEY_PREFIX + credentials.getSecretAccessKey()).getBytes(UTF8);
+            signingSecretMac = Mac.getInstance(HMAC_ALGORITHM);
+            signingSecretMac.init(new SecretKeySpec(signingSecret, HMAC_ALGORITHM));
+        } catch (UnsupportedEncodingException | NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new AWSIotException("Error in initializing signing secret MAC");
         }
+
+        if (signingSecretMac == null) {
+            throw new AWSIotException("Failure to initialize signing Mac");
+        }
+
         // AWS4 uses a series of derived keys, formed by hashing different
         // pieces of data
         byte[] signingDate = sign(dateStamp, signingSecretMac);

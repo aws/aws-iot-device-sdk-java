@@ -15,6 +15,7 @@
 
 package com.amazonaws.services.iot.client;
 
+import com.amazonaws.services.iot.client.auth.CredentialsProvider;
 import com.amazonaws.services.iot.client.core.AbstractAwsIotClient;
 
 import javax.net.ssl.SSLSocketFactory;
@@ -271,6 +272,32 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
     }
 
     /**
+     * Instantiates a new client using Secure WebSocket and AWS SigV4
+     * authentication. AWS IAM credentials, including the access key ID and
+     * secret access key, are required for signing the request. Credentials can
+     * be permanent ones associated with IAM users or temporary ones generated
+     * via the AWS Cognito service.
+     *
+     * @param clientEndpoint
+     *            the client endpoint in the form of
+     *            {@literal <account-specific-prefix>.iot.<region>.amazonaws.com}
+     *            . The account-specific prefix can be found on the AWS IoT
+     *            console or by using the {@code describe-endpoint} command
+     *            through the AWS command line interface.
+     * @param clientId
+     *            the client ID uniquely identify a MQTT connection. Two clients
+     *            with the same client ID are not allowed to be connected
+     *            concurrently to a same endpoint.
+     * @param provider
+     *            credentials provider to source AWS credentials from
+     * @param region
+     *            the AWS region
+     */
+    public AWSIotMqttClient(String clientEndpoint, String clientId, CredentialsProvider provider, String region) {
+        super(clientEndpoint, clientId, provider, region);
+    }
+
+    /**
      * Updates credentials used for signing Secure WebSocket URLs. When temporary
      * credentails used for the WebSocket connection are expired, newer
      * credentails can be supplied through this API to allow new connections to
@@ -283,6 +310,8 @@ public class AWSIotMqttClient extends AbstractAwsIotClient {
      * @param sessionToken
      *            Session token received along with the temporary credentials
      *            from services like STS server, AssumeRole, or Amazon Cognito.
+     *
+     * @deprecated prefer a session/caching aware credentials provider
      */
     @Override
     public void updateCredentials(String awsAccessKeyId, String awsSecretAccessKey, String sessionToken) {

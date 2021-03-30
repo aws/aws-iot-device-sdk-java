@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import javax.net.ssl.SSLSocketFactory;
 
+import com.amazonaws.services.iot.client.auth.CredentialsProvider;
 import com.amazonaws.services.iot.client.AWSIotConfig;
 import com.amazonaws.services.iot.client.AWSIotConnectionStatus;
 import com.amazonaws.services.iot.client.AWSIotDevice;
@@ -122,6 +123,23 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
                                    String awsSecretAccessKey, String sessionToken, String region) {
         // Enable Metrics by default
         this(clientEndpoint, clientId, awsAccessKeyId, awsSecretAccessKey, sessionToken, region, true);
+    }
+
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, CredentialsProvider provider, String region) {
+        this(clientEndpoint, clientId, provider, region, true);
+    }
+
+    protected AbstractAwsIotClient(String clientEndpoint, String clientId, CredentialsProvider provider, String region, boolean enableSdkMetrics) {
+        this.clientEndpoint = clientEndpoint;
+        this.clientId = clientId;
+        this.connectionType = AwsIotConnectionType.MQTT_OVER_WEBSOCKET;
+        this.clientEnableMetrics = enableSdkMetrics;
+
+        try {
+            connection = new AwsIotWebsocketConnection(this, provider, region);
+        } catch (AWSIotException e) {
+            throw new AwsIotRuntimeException(e);
+        }
     }
 
     AbstractAwsIotClient(String clientEndpoint, String clientId, AwsIotConnection connection,

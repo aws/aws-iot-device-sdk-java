@@ -82,7 +82,7 @@ of your Maven project.
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java</artifactId>
-    <version>1.3.8</version>
+    <version>1.3.9</version>
   </dependency>
 </dependencies>
 ```
@@ -94,7 +94,7 @@ The sample applications included with the SDK can also be installed using the fo
   <dependency>
     <groupId>com.amazonaws</groupId>
     <artifactId>aws-iot-device-sdk-java-samples</artifactId>
-    <version>1.3.8</version>
+    <version>1.3.9</version>
   </dependency>
 </dependencies>
 ```

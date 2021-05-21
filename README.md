@@ -136,7 +136,7 @@ and RSA keys are required. You can use the
 only a certificate file and private key file are required.
 
 ```java
-String clientEndpoint = "<prefix>.iot.<region>.amazonaws.com";       // replace <prefix> and <region> with your own
+String clientEndpoint = "<prefix>-ats.iot.<region>.amazonaws.com";   // use value returned by describe-endpoint --endpoint-type "iot:Data-ATS"
 String clientId = "<unique client id>";                              // replace with your own client ID. Use unique client IDs for concurrent connections.
 String certificateFile = "<certificate file>";                       // X.509 based certificate file
 String privateKeyFile = "<private key file>";                        // PKCS#1 or PKCS#8 PEM encoded private key file
@@ -161,7 +161,7 @@ As a best practice for application security, do not embed
 credentials directly in the source code.
 
 ```java
-String clientEndpoint = "<prefix>.iot.<region>.amazonaws.com";       // replace <prefix> and <region> with your own
+String clientEndpoint = "<prefix>-ats.iot.<region>.amazonaws.com";   // use value returned by describe-endpoint --endpoint-type "iot:Data-ATS"
 String clientId = "<unique client id>";                              // replace with your own client ID. Use unique client IDs for concurrent connections.
 
 // AWS IAM credentials could be retrieved from AWS Cognito, STS, or other secure sources
@@ -426,7 +426,7 @@ update and then retrieve it back every second.
 To run the samples, you will also need to provide the following arguments 
 through the command line:
 
-* clientEndpoint: client endpoint, in the form of ```<prefix>.iot.<region>.amazonaws.com```
+* clientEndpoint: client endpoint, obtained via calling describe-endpoint
 * clientId: client ID
 * thingName: AWS IoT thing name (not required for the Publish/Subscribe sample)
 
@@ -451,17 +451,17 @@ TLS mutual authentication is used).
 
 * To run the Publish/Subscribe sample, use the following command:
 ```sh
-$ mvn exec:java -pl aws-iot-device-sdk-java-samples -Dexec.mainClass="com.amazonaws.services.iot.client.sample.pubSub.PublishSubscribeSample" -Dexec.args="-clientEndpoint <prefix>.iot.<region>.amazonaws.com -clientId <unique client id> -certificateFile <certificate file> -privateKeyFile <private key file>"
+$ mvn exec:java -pl aws-iot-device-sdk-java-samples -Dexec.mainClass="com.amazonaws.services.iot.client.sample.pubSub.PublishSubscribeSample" -Dexec.args="-clientEndpoint <prefix>-ats.iot.<region>.amazonaws.com -clientId <unique client id> -certificateFile <certificate file> -privateKeyFile <private key file>"
 ```
 
 * To run the Shadow sample, use the following command:
 ```sh
-$ mvn exec:java -pl aws-iot-device-sdk-java-samples -Dexec.mainClass="com.amazonaws.services.iot.client.sample.shadow.ShadowSample" -Dexec.args="-clientEndpoint <prefix>.iot.<region>.amazonaws.com -clientId <unique client id> -thingName <thing name> -certificateFile <certificate file> -privateKeyFile <private key file>"
+$ mvn exec:java -pl aws-iot-device-sdk-java-samples -Dexec.mainClass="com.amazonaws.services.iot.client.sample.shadow.ShadowSample" -Dexec.args="-clientEndpoint <prefix>-ats.iot.<region>.amazonaws.com -clientId <unique client id> -thingName <thing name> -certificateFile <certificate file> -privateKeyFile <private key file>"
 ```
 
 * To run the Shadow echo sample, use the following command: 
 ```sh
-$ mvn exec:java -pl aws-iot-device-sdk-java-samples -Dexec.mainClass="com.amazonaws.services.iot.client.sample.shadowEcho.ShadowEchoSample" -Dexec.args="-clientEndpoint <prefix>.iot.<region>.amazonaws.com -clientId <unique client id> -thingName <thing name> -certificateFile <certificate file> -privateKeyFile <private key file>"
+$ mvn exec:java -pl aws-iot-device-sdk-java-samples -Dexec.mainClass="com.amazonaws.services.iot.client.sample.shadowEcho.ShadowEchoSample" -Dexec.args="-clientEndpoint <prefix>-ats.iot.<region>.amazonaws.com -clientId <unique client id> -thingName <thing name> -certificateFile <certificate file> -privateKeyFile <private key file>"
 ```
 
 ### Sample Source Code

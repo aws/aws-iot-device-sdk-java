@@ -509,6 +509,7 @@ public abstract class AbstractAwsIotClient implements AwsIotConnectionCallback {
         devices.clear();
 
         executionService.shutdown();
+        executionService = null;
     }
 
     public Future<?> scheduleTask(Runnable runnable) {

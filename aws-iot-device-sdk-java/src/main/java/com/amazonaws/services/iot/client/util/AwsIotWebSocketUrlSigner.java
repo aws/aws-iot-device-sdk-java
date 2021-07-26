@@ -80,7 +80,7 @@ public class AwsIotWebSocketUrlSigner {
      * @param endpoint
      *            service endpoint with or without customer specific URL prefix.
      *
-     * @Deprecated use provider-based constructor
+     * @deprecated use provider-based constructor
      */
     public AwsIotWebSocketUrlSigner(String endpoint) {
         this(endpoint, REGION_TO_BE_DETERMINED);

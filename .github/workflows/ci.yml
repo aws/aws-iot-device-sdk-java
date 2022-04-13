@@ -10,7 +10,7 @@ env:
   BUILDER_VERSION: v0.9.14
   BUILDER_SOURCE: releases
   BUILDER_HOST: https://d19elf31gohf1l.cloudfront.net
-  PACKAGE_NAME: aws-iot-device-sdk-java-v2
+  PACKAGE_NAME: aws-iot-device-sdk-java
   RUN: ${{ github.run_id }}-${{ github.run_number }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

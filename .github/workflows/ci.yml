@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!main'
+
+env:
+  BUILDER_VERSION: v0.9.14
+  BUILDER_SOURCE: releases
+  BUILDER_HOST: https://d19elf31gohf1l.cloudfront.net
+  PACKAGE_NAME: aws-iot-device-sdk-java-v2
+  RUN: ${{ github.run_id }}-${{ github.run_number }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+jobs:
+  linux-compat:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - manylinux2014-x64
+          - al2-x64
+          - fedora-34-x64
+          - opensuse-leap
+          - rhel8-x64
+          #- manylinux2014-x86 until we find 32-bit linux binaries we can use
+    steps:
+    - name: Build ${{ env.PACKAGE_NAME }}
+      run: |
+        aws s3 cp s3://aws-crt-test-stuff/ci/${{ env.BUILDER_VERSION }}/linux-container-ci.sh ./linux-container-ci.sh && chmod a+x ./linux-container-ci.sh
+        ./linux-container-ci.sh ${{ env.BUILDER_VERSION }} aws-crt-${{ matrix.image }} build -p ${{ env.PACKAGE_NAME }}
+
+  windows:
+    runs-on: windows-latest
+    steps:
+    - name: Build ${{ env.PACKAGE_NAME }} + consumers
+      run: |
+        python -c "from urllib.request import urlretrieve; urlretrieve('${{ env.BUILDER_HOST }}/${{ env.BUILDER_SOURCE }}/${{ env.BUILDER_VERSION }}/builder.pyz?run=${{ env.RUN }}', 'builder.pyz')"
+        python builder.pyz build -p ${{ env.PACKAGE_NAME }} --spec=downstream
+
+  osx:
+    runs-on: macos-latest
+    steps:
+    - name: Build ${{ env.PACKAGE_NAME }} + consumers
+      run: |
+        python3 -c "from urllib.request import urlretrieve; urlretrieve('${{ env.BUILDER_HOST }}/${{ env.BUILDER_SOURCE }}/${{ env.BUILDER_VERSION }}/builder.pyz?run=${{ env.RUN }}', 'builder')"
+        chmod a+x builder
+        ./builder build -p ${{ env.PACKAGE_NAME }} --spec=downstream
+
+  java-compat:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - 8
+          - 11
+          - 17
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.version }}
+          cache: maven
+      - name: Build ${{ env.PACKAGE_NAME }} + consumers
+        run: |
+          java -version
+          mvn -B test

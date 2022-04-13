@@ -1,0 +1,92 @@
+package com.amazonaws.services.iot.client.auth;
+
+import static org.junit.Assert.*;
+
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.AWSSessionCredentials;
+import com.amazonaws.services.iot.client.auth.Credentials;
+import com.amazonaws.services.iot.client.auth.CredentialsProvider;
+import org.junit.Test;
+
+public class AwsCredentialsProviderAdapterTest {
+
+    private static String ACCESS_KEY_ID = "TestAccessKeyId";
+    private static String SECRET_ACCESS_KEY = "TestSecretAccessKey";
+    private static String SESSION_TOKEN = "TestSessionToken";
+
+    private class TestAWSCredentials implements AWSCredentials {
+        private String accessKeyId;
+        private String secretAccessKey;
+
+        public TestAWSCredentials(String accessKeyId, String secretAccessKey) {
+            this.accessKeyId = accessKeyId;
+            this.secretAccessKey = secretAccessKey;
+        }
+
+        public String getAWSAccessKeyId() {
+            return accessKeyId;
+        }
+
+        public String getAWSSecretKey() {
+            return secretAccessKey;
+        }
+    }
+
+    private class TestSessionAWSCredentials extends TestAWSCredentials implements AWSSessionCredentials {
+        private String sessionToken;
+
+        public TestSessionAWSCredentials(String accessKeyId, String secretAccessKey, String sessionToken) {
+            super(accessKeyId, secretAccessKey);
+            this.sessionToken = sessionToken;
+        }
+
+        public String getSessionToken() {
+            return sessionToken;
+        }
+    }
+
+    private class TestStaticAWSCredentialsProvider implements AWSCredentialsProvider {
+
+        private AWSCredentials credentials;
+
+        public TestStaticAWSCredentialsProvider(AWSCredentials credentials) {
+            this.credentials = credentials;
+        }
+
+        public AWSCredentials getCredentials() {
+            return credentials;
+        }
+
+        public void refresh() {}
+    }
+
+    private void testAdapter(String accessKeyId, String secretAccessKey, String sessionToken) {
+        AWSCredentials innerCreds = null;
+        if (sessionToken == null) {
+            innerCreds = new TestAWSCredentials(accessKeyId, secretAccessKey);
+        } else {
+            innerCreds = new TestSessionAWSCredentials(accessKeyId, secretAccessKey, sessionToken);
+        }
+
+        AWSCredentialsProvider innerProvider = new TestStaticAWSCredentialsProvider(innerCreds);
+        CredentialsProvider provider = new AwsCredentialsProviderAdapter(innerProvider);
+
+        Credentials credentials = provider.getCredentials();
+        assertEquals(accessKeyId, credentials.getAccessKeyId());
+        assertEquals(secretAccessKey, credentials.getSecretAccessKey());
+        assertEquals(sessionToken, credentials.getSessionToken());
+    }
+
+    @Test
+    public void testAdapterFetchCredentials() {
+        testAdapter(ACCESS_KEY_ID, SECRET_ACCESS_KEY, null);
+    }
+
+    @Test
+    public void testAdapterFetchSessionCredentials() {
+        testAdapter(ACCESS_KEY_ID, SECRET_ACCESS_KEY, SESSION_TOKEN);
+    }
+
+
+}

@@ -30,6 +30,11 @@ jobs:
           - rhel8-x64
           #- manylinux2014-x86 until we find 32-bit linux binaries we can use
     steps:
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: arn:aws:iam::123124136734:user/github
+        aws-region: us-east-1
     - name: Build ${{ env.PACKAGE_NAME }}
       run: |
         aws s3 cp s3://aws-crt-test-stuff/ci/${{ env.BUILDER_VERSION }}/linux-container-ci.sh ./linux-container-ci.sh && chmod a+x ./linux-container-ci.sh

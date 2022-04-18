@@ -240,7 +240,7 @@ public class AwsIotConnectionTest {
 
     @Test
     public void testOnConnectionClosed() {
-        when(client.getMaxConnectionRetries()).thenReturn(0);
+        lenient().when(client.getMaxConnectionRetries()).thenReturn(0);
 
         TestConnection connection = new TestConnection(client);
 

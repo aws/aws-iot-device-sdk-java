@@ -86,7 +86,7 @@ public class AwsIotDeviceSyncMessageTest {
     @Test
     public void testOnFailureOtherError() {
         AtomicLong localVersion = new AtomicLong(-1);
-        when(device.getLocalVersion()).thenReturn(localVersion);
+        lenient().when(device.getLocalVersion()).thenReturn(localVersion);
 
         AwsIotDeviceSyncMessage message = new AwsIotDeviceSyncMessage(TEST_TOPIC, TEST_QOS, device);
         message.setErrorCode(AWSIotDeviceErrorCode.INTERNAL_SERVICE_FAILURE);

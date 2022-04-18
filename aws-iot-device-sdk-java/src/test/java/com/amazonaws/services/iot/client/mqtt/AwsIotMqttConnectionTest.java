@@ -3,7 +3,7 @@ package com.amazonaws.services.iot.client.mqtt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.nullable;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.nullable;
 import static org.mockito.Mockito.doAnswer;
@@ -61,7 +61,7 @@ public class AwsIotMqttConnectionTest {
                 runnable.run();
                 return null;
             }
-        }).when(client).scheduleTask(any(Runnable.class));
+        }).when(client).scheduleTask(nullable(Runnable.class));
 
         when(client.getConnectionTimeout()).thenReturn(3000);
         when(client.getKeepAliveInterval()).thenReturn(3000);
@@ -78,11 +78,11 @@ public class AwsIotMqttConnectionTest {
                 options = (MqttConnectOptions) invocation.getArguments()[0];
                 return null;
             }
-        }).when(mqttClient).connect(any(MqttConnectOptions.class), nullable(Object.class), any(IMqttActionListener.class));
+        }).when(mqttClient).connect(nullable(MqttConnectOptions.class), nullable(Object.class), nullable(IMqttActionListener.class));
 
         connection.openConnection(null);
 
-        verify(mqttClient).connect(any(MqttConnectOptions.class), nullable(Object.class), any(IMqttActionListener.class));
+        verify(mqttClient).connect(nullable(MqttConnectOptions.class), nullable(Object.class), nullable(IMqttActionListener.class));
 
         assertEquals(true, options.isCleanSession());
         assertEquals(null, options.getSocketFactory());
@@ -110,7 +110,7 @@ public class AwsIotMqttConnectionTest {
 
     @Test(expected = AWSIotException.class)
     public void testOpenConnectionException() throws AWSIotException, MqttSecurityException, MqttException {
-        when(mqttClient.connect(any(MqttConnectOptions.class), nullable(Object.class), any(IMqttActionListener.class)))
+        when(mqttClient.connect(nullable(MqttConnectOptions.class), nullable(Object.class), nullable(IMqttActionListener.class)))
                 .thenThrow(new MqttException(0));
 
         connection.openConnection(null);
@@ -118,17 +118,17 @@ public class AwsIotMqttConnectionTest {
 
     @Test
     public void testCloseConnection() throws MqttException, AWSIotException {
-        when(mqttClient.disconnect(anyInt(), nullable(Object.class), any(IMqttActionListener.class)))
+        when(mqttClient.disconnect(anyInt(), nullable(Object.class), nullable(IMqttActionListener.class)))
                 .thenReturn(new MqttToken());
 
         connection.closeConnection(null);
 
-        verify(mqttClient).disconnect(anyInt(), nullable(Object.class), any(IMqttActionListener.class));
+        verify(mqttClient).disconnect(anyInt(), nullable(Object.class), nullable(IMqttActionListener.class));
     }
 
     @Test(expected = AWSIotException.class)
     public void testCloseConnectionException() throws MqttException, AWSIotException {
-        when(mqttClient.disconnect(anyInt(), nullable(Object.class), any(IMqttActionListener.class)))
+        when(mqttClient.disconnect(anyInt(), nullable(Object.class), nullable(IMqttActionListener.class)))
                 .thenThrow(new MqttException(0));
 
         connection.closeConnection(null);
@@ -146,13 +146,13 @@ public class AwsIotMqttConnectionTest {
                 mqttMessage = (MqttMessage) invocation.getArguments()[1];
                 return null;
             }
-        }).when(mqttClient).publish(any(String.class), any(MqttMessage.class), nullable(Object.class),
-                any(IMqttActionListener.class));
+        }).when(mqttClient).publish(nullable(String.class), nullable(MqttMessage.class), nullable(Object.class),
+                nullable(IMqttActionListener.class));
 
         connection.publishMessage(message);
 
-        verify(mqttClient).publish(any(String.class), any(MqttMessage.class), nullable(Object.class),
-                any(IMqttActionListener.class));
+        verify(mqttClient).publish(nullable(String.class), nullable(MqttMessage.class), nullable(Object.class),
+                nullable(IMqttActionListener.class));
         assertEquals("test/topic", mqttTopic);
         assertEquals(1, mqttMessage.getQos());
         assertTrue(Arrays.equals("payload".getBytes(), mqttMessage.getPayload()));
@@ -163,8 +163,8 @@ public class AwsIotMqttConnectionTest {
             throws MqttPersistenceException, MqttException, AWSIotException, AwsIotRetryableException {
         AWSIotMessage message = new AWSIotMessage("test/topic", AWSIotQos.QOS1, "payload");
 
-        when(mqttClient.publish(any(String.class), any(MqttMessage.class), nullable(Object.class),
-                any(IMqttActionListener.class))).thenThrow(new MqttException(0));
+        when(mqttClient.publish(nullable(String.class), nullable(MqttMessage.class), nullable(Object.class),
+                nullable(IMqttActionListener.class))).thenThrow(new MqttException(0));
 
         connection.publishMessage(message);
     }
@@ -174,8 +174,8 @@ public class AwsIotMqttConnectionTest {
             throws MqttPersistenceException, MqttException, AWSIotException, AwsIotRetryableException {
         AWSIotMessage message = new AWSIotMessage("test/topic", AWSIotQos.QOS1, "payload");
 
-        when(mqttClient.publish(any(String.class), any(MqttMessage.class), nullable(Object.class),
-                any(IMqttActionListener.class)))
+        when(mqttClient.publish(nullable(String.class), nullable(MqttMessage.class), nullable(Object.class),
+                nullable(IMqttActionListener.class)))
                         .thenThrow(new MqttException(MqttException.REASON_CODE_CLIENT_NOT_CONNECTED));
 
         connection.publishMessage(message);
@@ -193,11 +193,11 @@ public class AwsIotMqttConnectionTest {
                 mqttQos = (int) invocation.getArguments()[1];
                 return null;
             }
-        }).when(mqttClient).subscribe(any(String.class), anyInt(), nullable(Object.class), any(IMqttActionListener.class));
+        }).when(mqttClient).subscribe(nullable(String.class), anyInt(), nullable(Object.class), nullable(IMqttActionListener.class));
 
         connection.subscribeTopic(message);
 
-        verify(mqttClient).subscribe(any(String.class), anyInt(), nullable(Object.class), any(IMqttActionListener.class));
+        verify(mqttClient).subscribe(nullable(String.class), anyInt(), nullable(Object.class), nullable(IMqttActionListener.class));
         assertEquals("test/topic", mqttTopic);
         assertEquals(1, mqttQos);
     }
@@ -207,7 +207,7 @@ public class AwsIotMqttConnectionTest {
             throws MqttPersistenceException, MqttException, AWSIotException, AwsIotRetryableException {
         AWSIotMessage message = new AWSIotMessage("test/topic", AWSIotQos.QOS1);
 
-        when(mqttClient.subscribe(any(String.class), anyInt(), nullable(Object.class), any(IMqttActionListener.class)))
+        when(mqttClient.subscribe(nullable(String.class), anyInt(), nullable(Object.class), nullable(IMqttActionListener.class)))
                 .thenThrow(new MqttException(0));
 
         connection.subscribeTopic(message);
@@ -218,7 +218,7 @@ public class AwsIotMqttConnectionTest {
             throws MqttPersistenceException, MqttException, AWSIotException, AwsIotRetryableException {
         AWSIotMessage message = new AWSIotMessage("test/topic", AWSIotQos.QOS1);
 
-        when(mqttClient.subscribe(any(String.class), anyInt(), nullable(Object.class), any(IMqttActionListener.class)))
+        when(mqttClient.subscribe(nullable(String.class), anyInt(), nullable(Object.class), nullable(IMqttActionListener.class)))
                 .thenThrow(new MqttException(MqttException.REASON_CODE_CLIENT_NOT_CONNECTED));
 
         connection.subscribeTopic(message);
@@ -235,11 +235,11 @@ public class AwsIotMqttConnectionTest {
                 mqttTopic = (String) invocation.getArguments()[0];
                 return null;
             }
-        }).when(mqttClient).unsubscribe(any(String.class), nullable(Object.class), any(IMqttActionListener.class));
+        }).when(mqttClient).unsubscribe(nullable(String.class), nullable(Object.class), nullable(IMqttActionListener.class));
 
         connection.unsubscribeTopic(message);
 
-        verify(mqttClient).unsubscribe(any(String.class), nullable(Object.class), any(IMqttActionListener.class));
+        verify(mqttClient).unsubscribe(nullable(String.class), nullable(Object.class), nullable(IMqttActionListener.class));
         assertEquals("test/topic", mqttTopic);
     }
 
@@ -248,7 +248,7 @@ public class AwsIotMqttConnectionTest {
             throws MqttPersistenceException, MqttException, AWSIotException, AwsIotRetryableException {
         AWSIotMessage message = new AWSIotMessage("test/topic", AWSIotQos.QOS1);
 
-        when(mqttClient.unsubscribe(any(String.class), nullable(Object.class), any(IMqttActionListener.class)))
+        when(mqttClient.unsubscribe(nullable(String.class), nullable(Object.class), nullable(IMqttActionListener.class)))
                 .thenThrow(new MqttException(0));
 
         connection.unsubscribeTopic(message);
@@ -259,7 +259,7 @@ public class AwsIotMqttConnectionTest {
             throws MqttPersistenceException, MqttException, AWSIotException, AwsIotRetryableException {
         AWSIotMessage message = new AWSIotMessage("test/topic", AWSIotQos.QOS1);
 
-        when(mqttClient.unsubscribe(any(String.class), nullable(Object.class), any(IMqttActionListener.class)))
+        when(mqttClient.unsubscribe(nullable(String.class), nullable(Object.class), nullable(IMqttActionListener.class)))
                 .thenThrow(new MqttException(MqttException.REASON_CODE_CLIENT_NOT_CONNECTED));
 
         connection.unsubscribeTopic(message);

@@ -117,12 +117,12 @@ public class AwsIotMqttConnectionTest {
 
     @Test
     public void testCloseConnection() throws MqttException, AWSIotException {
-        when(mqttClient.disconnect(anyInt(), any(Object.class), any(IMqttActionListener.class)))
+        when(mqttClient.disconnect(anyInt(), any(Object.class), any(AwsIotMqttConnectionListener.class)))
                 .thenReturn(new MqttToken());
 
         connection.closeConnection(null);
 
-        verify(mqttClient).disconnect(anyInt(), any(Object.class), any(IMqttActionListener.class));
+        verify(mqttClient).disconnect(anyInt(), any(), any(AwsIotMqttConnectionListener.class));
     }
 
     @Test(expected = AWSIotException.class)

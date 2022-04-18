@@ -12,7 +12,7 @@ import com.amazonaws.services.iot.client.AWSIotDeviceProperty;
 
 public class TestDevice extends AWSIotDevice {
 
-    private static final Logger LOGGER = Logger.getLogger(AWSIotDeviceIntegrationTest.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(TestDevice.class.getName());
 
     @AWSIotDeviceProperty(allowUpdate = false)
     private String serialNumber;

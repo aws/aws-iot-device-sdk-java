@@ -7,32 +7,10 @@ on:
       - '!main'
 
 env:
-  BUILDER_VERSION: v0.9.14
-  BUILDER_SOURCE: releases
-  BUILDER_HOST: https://d19elf31gohf1l.cloudfront.net
   PACKAGE_NAME: aws-iot-device-sdk-java
   RUN: ${{ github.run_id }}-${{ github.run_number }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: us-east-1
 
 jobs:
-  linux-compat:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          - fedora-34-x64
-          - opensuse-leap
-          - rhel8-x64
-          #- manylinux2014-x86 until we find 32-bit linux binaries we can use
-    steps:
-    - name: Build ${{ env.PACKAGE_NAME }}
-      run: |
-        aws s3 cp s3://aws-crt-test-stuff/ci/${{ env.BUILDER_VERSION }}/linux-container-ci.sh ./linux-container-ci.sh && chmod a+x ./linux-container-ci.sh
-        ./linux-container-ci.sh ${{ env.BUILDER_VERSION }} aws-crt-${{ matrix.image }} build -p ${{ env.PACKAGE_NAME }}
-
   windows:
     runs-on: windows-latest
     steps:

@@ -184,28 +184,30 @@ public class AwsIotConnectionTest {
         assertEquals(3, connection.getRetryTimes());
     }
 
-    // @Test
-    // public void testRetryDelay() throws AWSIotException, NoSuchFieldException {
-    //     when(client.getBaseRetryDelay()).thenReturn(3000);
-    //     when(client.getMaxRetryDelay()).thenReturn(30000);
+    @Test
+    public void testRetryDelay() throws AWSIotException, NoSuchFieldException, IllegalAccessException {
+        when(client.getBaseRetryDelay()).thenReturn(3000);
+        when(client.getMaxRetryDelay()).thenReturn(30000);
 
-    //     TestConnection connection = new TestConnection(client);
-    //     FieldSetter retryTimesSetter = new FieldSetter(connection, AwsIotConnection.class.getDeclaredField("retryTimes"));
+        TestConnection connection = new TestConnection(client);
+        Field retryTimesSetter = AwsIotConnection.class.getDeclaredField("retryTimes");
+        retryTimesSetter.setAccessible(true);
+        //FieldSetter retryTimesSetter = new FieldSetter(connection, AwsIotConnection.class.getDeclaredField("retryTimes"));
 
-    //     retryTimesSetter.set(0);
-    //     assertEquals(client.getBaseRetryDelay(), connection.getRetryDelay());
+        retryTimesSetter.set(connection,0);
+        assertEquals(client.getBaseRetryDelay(), connection.getRetryDelay());
 
-    //     // Try a huge range of values. Take exponential steps so the test doesn't take too long.
-    //     for (int retryTimes = 1; retryTimes < Integer.MAX_VALUE / 2; retryTimes *= 2) {
-    //         retryTimesSetter.set(retryTimes);
-    //         assertTrue(client.getBaseRetryDelay() <= connection.getRetryDelay());
-    //         assertTrue(client.getMaxRetryDelay() >= connection.getRetryDelay());
-    //     }
+        // Try a huge range of values. Take exponential steps so the test doesn't take too long.
+        for (int retryTimes = 1; retryTimes < Integer.MAX_VALUE / 2; retryTimes *= 2) {
+            retryTimesSetter.set(connection, retryTimes);
+            assertTrue(client.getBaseRetryDelay() <= connection.getRetryDelay());
+            assertTrue(client.getMaxRetryDelay() >= connection.getRetryDelay());
+        }
 
-    //     // Try largest possible value
-    //     retryTimesSetter.set(Integer.MAX_VALUE);
-    //     assertEquals(client.getMaxRetryDelay(), connection.getRetryDelay());
-    // }
+        // Try largest possible value
+        retryTimesSetter.set(connection, Integer.MAX_VALUE);
+        assertEquals(client.getMaxRetryDelay(), connection.getRetryDelay());
+    }
 
     @Test
     public void testOnConnectionSuccess() throws AWSIotException {

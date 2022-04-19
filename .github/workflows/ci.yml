@@ -19,6 +19,14 @@ env:
 jobs:
   linux-compat:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - fedora-34-x64
+          - opensuse-leap
+          - rhel8-x64
+          #- manylinux2014-x86 until we find 32-bit linux binaries we can use
     steps:
     - name: Build ${{ env.PACKAGE_NAME }}
       run: |

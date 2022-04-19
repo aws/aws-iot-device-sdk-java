@@ -4,6 +4,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.nullable;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,9 +63,9 @@ public class AwsIotTlsSocketFactoryTest {
 
     @Test
     public void testCreateSocketWithSocket() throws IOException {
-        when(sslSocketFactory.createSocket(any(Socket.class), anyString(), anyInt(), anyBoolean())).thenReturn(socket);
+        when(sslSocketFactory.createSocket(nullable(Socket.class), anyString(), anyInt(), anyBoolean())).thenReturn(socket);
 
-        tlsSocketFactory.createSocket(any(Socket.class), anyString(), anyInt(), anyBoolean());
+        tlsSocketFactory.createSocket(nullable(Socket.class), anyString(), anyInt(), anyBoolean());
 
         verify(socket, times(1)).setEnabledProtocols(new String[] { "TLSv1.2" });
     }
@@ -80,28 +81,28 @@ public class AwsIotTlsSocketFactoryTest {
 
     @Test
     public void testCreateSocketWithInetAddress() throws IOException, UnknownHostException {
-        when(sslSocketFactory.createSocket(anyString(), anyInt(), any(InetAddress.class), anyInt())).thenReturn(socket);
+        when(sslSocketFactory.createSocket(anyString(), anyInt(), nullable(InetAddress.class), anyInt())).thenReturn(socket);
 
-        tlsSocketFactory.createSocket(anyString(), anyInt(), any(InetAddress.class), anyInt());
+        tlsSocketFactory.createSocket(anyString(), anyInt(), nullable(InetAddress.class), anyInt());
 
         verify(socket, times(1)).setEnabledProtocols(new String[] { "TLSv1.2" });
     }
 
     @Test
     public void testCreateSocketWithInetAddressAndPort() throws IOException {
-        when(sslSocketFactory.createSocket(any(InetAddress.class), anyInt())).thenReturn(socket);
+        when(sslSocketFactory.createSocket(nullable(InetAddress.class), anyInt())).thenReturn(socket);
 
-        tlsSocketFactory.createSocket(any(InetAddress.class), anyInt());
+        tlsSocketFactory.createSocket(nullable(InetAddress.class), anyInt());
 
         verify(socket, times(1)).setEnabledProtocols(new String[] { "TLSv1.2" });
     }
 
     @Test
     public void testCreateSocketWithInetAddressAndLocalInetAddress() throws IOException {
-        when(sslSocketFactory.createSocket(any(InetAddress.class), anyInt(), any(InetAddress.class), anyInt()))
+        when(sslSocketFactory.createSocket(nullable(InetAddress.class), anyInt(), nullable(InetAddress.class), anyInt()))
                 .thenReturn(socket);
 
-        tlsSocketFactory.createSocket(any(InetAddress.class), anyInt(), any(InetAddress.class), anyInt());
+        tlsSocketFactory.createSocket(nullable(InetAddress.class), anyInt(), nullable(InetAddress.class), anyInt());
 
         verify(socket, times(1)).setEnabledProtocols(new String[] { "TLSv1.2" });
     }

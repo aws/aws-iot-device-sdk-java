@@ -3,12 +3,14 @@ package com.amazonaws.services.iot.client.mqtt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.nullable;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.nullable;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 import java.util.Arrays;
 import java.util.concurrent.Future;
@@ -54,7 +56,7 @@ public class AwsIotMqttConnectionTest {
 
     @Before
     public void setup() throws AWSIotException {
-        doAnswer(new Answer<Future<?>>() {
+        lenient().doAnswer(new Answer<Future<?>>() {
             @Override
             public Future<?> answer(InvocationOnMock invocation) throws Throwable {
                 Runnable runnable = (Runnable) invocation.getArguments()[0];
@@ -118,17 +120,17 @@ public class AwsIotMqttConnectionTest {
 
     @Test
     public void testCloseConnection() throws MqttException, AWSIotException {
-        when(mqttClient.disconnect(anyInt(), nullable(Object.class), nullable(IMqttActionListener.class)))
+        lenient().when(mqttClient.disconnect(anyInt(), nullable(Object.class), nullable(IMqttActionListener.class)))
                 .thenReturn(new MqttToken());
 
         connection.closeConnection(null);
 
-        verify(mqttClient).disconnect(anyInt(), nullable(Object.class), nullable(IMqttActionListener.class));
+        verify(mqttClient).disconnect(anyLong(), nullable(Object.class), nullable(IMqttActionListener.class));
     }
 
     @Test(expected = AWSIotException.class)
     public void testCloseConnectionException() throws MqttException, AWSIotException {
-        when(mqttClient.disconnect(anyInt(), nullable(Object.class), nullable(IMqttActionListener.class)))
+        when(mqttClient.disconnect(anyLong(), nullable(Object.class), nullable(IMqttActionListener.class)))
                 .thenThrow(new MqttException(0));
 
         connection.closeConnection(null);

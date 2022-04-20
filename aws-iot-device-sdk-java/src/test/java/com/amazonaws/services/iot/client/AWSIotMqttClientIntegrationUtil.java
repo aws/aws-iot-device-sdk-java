@@ -10,7 +10,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.amazonaws.services.iot.client.odin.OdinUtil;
+import com.amazonaws.services.iot.client.CredentialUtil;
 
 public class AWSIotMqttClientIntegrationUtil {
 
@@ -19,7 +19,9 @@ public class AWSIotMqttClientIntegrationUtil {
 
     private static final String AUTH_MODE = System.getProperty("authMode");
 
-    private static final String ODIN_MATERIALSET = System.getProperty("materialSet");
+    private static final Boolean IS_WEBSOCKET = Boolean.parseBoolean(System.getProperty("isWebSocket"));
+    private static final String PUBLIC_MATERIAL = System.getProperty("materialSet");
+    private static final String PRIVATE_MATERIAL = System.getProperty("materialSet");
     private static final String KEYSTORE_FILE = System.getProperty("keystoreFile");
     private static final String KEYSTORE_PASSWORD = System.getProperty("keystorePassword");
     private static final String KEY_PASSWORD = System.getProperty("keyPassword");
@@ -62,10 +64,9 @@ public class AWSIotMqttClientIntegrationUtil {
 
         if (AUTH_MODE != null) {
             switch (AUTH_MODE) {
-                case AuthMode.CERT_AUTH: // OdinUtil handles cert from odin to generate client as well. : )
+                case AuthMode.CERT_AUTH: // CredentialUtil handles cert from odin to generate client as well. : )
                 case AuthMode.WSS_SIGV4_AUTH:
-                    assertNotNull("Odin material set not provided", ODIN_MATERIALSET);
-                    client = OdinUtil.newClient(CLIENT_ENDPOINT, CLIENT_ID + suffix, ODIN_MATERIALSET);
+                    client = CredentialUtil.newClient(CLIENT_ENDPOINT, CLIENT_ID + suffix, PUBLIC_MATERIAL, PRIVATE_MATERIAL, IS_WEBSOCKET);
                     break;
                 default:
                     throw new UnsupportedOperationException("No such auth mode supported: " + AUTH_MODE);
@@ -87,8 +88,8 @@ public class AWSIotMqttClientIntegrationUtil {
             } catch (Exception e) {
                 fail("Failed to load keystore file for the integration tests");
             }
-        } else if (ODIN_MATERIALSET != null) {
-            client = OdinUtil.newClient(CLIENT_ENDPOINT, CLIENT_ID + suffix, ODIN_MATERIALSET);
+        } else if (PUBLIC_MATERIAL != null && PRIVATE_MATERIAL != null) {
+            client = CredentialUtil.newClient(CLIENT_ENDPOINT, CLIENT_ID + suffix, PUBLIC_MATERIAL, PRIVATE_MATERIAL, IS_WEBSOCKET);
         }
 
         return client;

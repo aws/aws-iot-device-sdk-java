@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!main'
+
+env:
+  BUILDER_VERSION: v0.9.14
+  BUILDER_SOURCE: releases
+  BUILDER_HOST: https://d19elf31gohf1l.cloudfront.net
+  PACKAGE_NAME: aws-iot-device-sdk-java
+  RUN: ${{ github.run_id }}-${{ github.run_number }}
+
+jobs:
+  java-compat:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - 8
+          - 11
+          - 17
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.version }}
+          cache: maven
+      - name: Build ${{ env.PACKAGE_NAME }} + consumers
+        run: |
+          java -version
+          mvn -B test

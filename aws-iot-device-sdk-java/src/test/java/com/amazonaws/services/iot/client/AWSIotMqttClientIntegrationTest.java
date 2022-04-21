@@ -20,6 +20,7 @@ import java.util.UUID;
 public class AWSIotMqttClientIntegrationTest {
 
     private static final Logger LOGGER = Logger.getLogger(AWSIotMqttClientIntegrationTest.class.getName());
+    // Use UID to distinguish concurrent running test 
     private static final String TOPIC_UID = UUID.randomUUID().toString();
     private static final String WILL_TOPIC = TOPIC_UID+"client/status";
 

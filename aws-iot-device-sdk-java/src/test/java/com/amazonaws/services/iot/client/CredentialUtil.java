@@ -44,6 +44,7 @@ import com.amazonaws.services.secretsmanager.model.*;
  */
 public class CredentialUtil {
     public static final String AWS_REGION = "us-east-1";
+    // Use UID to distinguish concurrent running test 
     public static final String TEST_UID = UUID.randomUUID().toString();
 
 

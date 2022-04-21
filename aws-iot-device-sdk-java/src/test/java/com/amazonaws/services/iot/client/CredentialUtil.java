@@ -31,7 +31,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
-
 import com.amazonaws.services.iot.client.AWSIotMqttClient;
 
 import com.amazonaws.services.secretsmanager.AWSSecretsManager;
@@ -97,7 +96,7 @@ public class CredentialUtil {
         
         try {
             Certificate certificate = loadCertificate(certificateString.getBytes("UTF-8"));
-            PrivateKey privateKey = loadPrivateKey(privateKeyString.getBytes("UTF-8"));
+            PrivateKey privateKey = loadPrivateKey(formatPrivateKey(privateKeyString));
 
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null);
@@ -154,6 +153,20 @@ public class CredentialUtil {
         return privateKey;
     }
 
+    /**
+     * Formart private key and decode it to byte[].
+     *
+     * @param privateKeyString
+     *            private key String
+     * @return the decoded private key
+     */
+    private static byte[] formatPrivateKey(String privateKeyString) {
+        String formattedKey = privateKeyString
+                .replace("-----BEGIN PRIVATE KEY-----\n", "")
+                .replace("\n-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+        return Base64.getDecoder().decode(formattedKey);
+    }
 
     ///////////////////////////////////////////////////////////////////
     // Retrieve AWS Credential

@@ -30,6 +30,7 @@ import java.security.cert.CertificateFactory;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
+import java.util.UUID;
 
 import com.amazonaws.services.iot.client.AWSIotMqttClient;
 
@@ -68,11 +69,13 @@ public class CredentialUtil {
         String publicMaterial = CredentialUtil.getSecret(publicMaterialARN);
         String privateMaterial = CredentialUtil.getSecret(privateMateiralARN);
 
+        String uniq_clientid = clientId + UUID.randomUUID().toString();
+
         if (isWebSocket == false) {
-            return newMqttTlsClient(clientEndpoint, clientId, publicMaterial,
+            return newMqttTlsClient(clientEndpoint, uniq_clientid, publicMaterial,
                     privateMaterial);
         } else {
-            return new AWSIotMqttClient(clientEndpoint, clientId, publicMaterial, privateMaterial);
+            return new AWSIotMqttClient(clientEndpoint, uniq_clientid, publicMaterial, privateMaterial);
         }
     }
 

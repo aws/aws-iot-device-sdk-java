@@ -12,12 +12,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import java.util.UUID;
 
 public class AWSIotDeviceIntegrationTest implements TestDeviceNotifier {
 
     private static final Logger LOGGER = Logger.getLogger(AWSIotDeviceIntegrationTest.class.getName());
     private static final String UPDATE_TOPIC = "$aws/things/?/shadow/update";
-    private static final String THING_NAME = System.getProperty("thingName");
+    private static final String THING_NAME = System.getProperty("thingName") + UUID.randomUUID().toString();
     private static final String STABILITY_TEST_ITERATIONS = System.getProperty("stabilityTestIterations");
 
     private AWSIotMqttClient client;

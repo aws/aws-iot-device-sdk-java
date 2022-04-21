@@ -21,7 +21,7 @@ public class AWSIotMqttClientIntegrationTest {
 
     private static final Logger LOGGER = Logger.getLogger(AWSIotMqttClientIntegrationTest.class.getName());
     private static final String TOPIC_UID = UUID.randomUUID().toString();
-    private static final String WILL_TOPIC = "client/status";
+    private static final String WILL_TOPIC = TOPIC_UID+"client/status";
 
     private AWSIotMqttClient client;
     private AWSIotMqttClient receiverClient;

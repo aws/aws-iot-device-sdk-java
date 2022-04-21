@@ -43,7 +43,9 @@ import com.amazonaws.services.secretsmanager.model.*;
  * pair.
  */
 public class CredentialUtil {
-    public static final String AWS_REGION = "us-east-1";  
+    public static final String AWS_REGION = "us-east-1";
+    public static final String TEST_UID = UUID.randomUUID().toString();
+
 
 
     /**
@@ -69,13 +71,11 @@ public class CredentialUtil {
         String publicMaterial = CredentialUtil.getSecret(publicMaterialARN);
         String privateMaterial = CredentialUtil.getSecret(privateMateiralARN);
 
-        String uniq_clientid = clientId + UUID.randomUUID().toString();
-
         if (isWebSocket == false) {
-            return newMqttTlsClient(clientEndpoint, uniq_clientid, publicMaterial,
+            return newMqttTlsClient(clientEndpoint, clientId+TEST_UID, publicMaterial,
                     privateMaterial);
         } else {
-            return new AWSIotMqttClient(clientEndpoint, uniq_clientid, publicMaterial, privateMaterial);
+            return new AWSIotMqttClient(clientEndpoint, clientId+TEST_UID, publicMaterial, privateMaterial);
         }
     }
 

@@ -15,11 +15,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import java.util.UUID;
 
 public class AWSIotMqttClientIntegrationTest {
 
     private static final Logger LOGGER = Logger.getLogger(AWSIotMqttClientIntegrationTest.class.getName());
-
+    private static final String TOPIC_UID = UUID.randomUUID().toString();
     private static final String WILL_TOPIC = "client/status";
 
     private AWSIotMqttClient client;
@@ -164,13 +165,13 @@ public class AWSIotMqttClientIntegrationTest {
         random.nextBytes(payload);
 
         List<TestTopic> topics = new ArrayList<>();
-        TestTopic topic1 = new TestTopic("one/test/topic", payload);
+        TestTopic topic1 = new TestTopic(TOPIC_UID+"one/test/topic", payload);
         topics.add(topic1);
-        TestTopic topic2 = new TestTopic("one/+/topic", payload);
+        TestTopic topic2 = new TestTopic(TOPIC_UID+"one/+/topic", payload);
         topics.add(topic2);
-        TestTopic topic3 = new TestTopic("one/test/+", payload);
+        TestTopic topic3 = new TestTopic(TOPIC_UID+"one/test/+", payload);
         topics.add(topic3);
-        TestTopic topic4 = new TestTopic("one/#", payload);
+        TestTopic topic4 = new TestTopic(TOPIC_UID+"one/#", payload);
         topics.add(topic4);
 
         client.connect();
@@ -214,7 +215,7 @@ public class AWSIotMqttClientIntegrationTest {
         for (int i = 0; i < numOfTopics; i++) {
             byte[] payload = new byte[payloadSize];
             random.nextBytes(payload);
-            TestTopic topic = new TestTopic("test/topic/" + i, payload);
+            TestTopic topic = new TestTopic("test/topic/"+TOPIC_UID+"/" + i, payload);
             topics.add(topic);
         }
 

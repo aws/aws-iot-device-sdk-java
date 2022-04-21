@@ -104,9 +104,26 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.2</version>
-        <configuration>
-          <systemPropertiesFile>src/test/java/com/amazonaws/services/iot/client/system_props.properties</systemPropertiesFile>
-        </configuration>
+        <executions>
+          <execution>
+              <id>main-run</id>
+               <goals>
+                <goal>test</goal>
+              </goals>
+              <configuration>
+                <systemPropertiesFile>src/test/java/com/amazonaws/services/iot/client/system_props_mutualAuth.properties</systemPropertiesFile>
+              </configuration>
+          </execution>
+          <execution>
+              <id>default-test</id>
+              <goals>
+                <goal>test</goal>
+              </goals>
+              <configuration>
+                <systemPropertiesFile>src/test/java/com/amazonaws/services/iot/client/system_props_websocket.properties</systemPropertiesFile>
+              </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

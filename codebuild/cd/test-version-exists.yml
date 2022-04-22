@@ -5,6 +5,6 @@ version: 0.2
 phases:
   build:
     commands:
-      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-jav
+      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
       - bash ./codebuild/cd/test-version-exists.sh
   

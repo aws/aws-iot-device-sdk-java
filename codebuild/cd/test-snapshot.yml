@@ -12,14 +12,15 @@ phases:
   pre_build:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
-      - export PKG_VERSION=$(git describe --tags | sed -e s/^v//)
+      # - export PKG_VERSION=$(git describe --tags | sed -e s/^v//)
+      - - export PKG_VERSION=1.3.10
 
   build:
     commands:
       # Verify that the package can be found in the snapshot repo
       # note that this uses an ancient version of maven and the maven dependency plugin because we're on trusty
       # http://maven.apache.org/plugins-archives/maven-dependency-plugin-2.1/get-mojo.html
-      - mvn -B dependency:get -DrepoUrl=https://aws.oss.sonatype.org/content/repositories/snapshots -Dartifact=com.amazonaws:aws-iot-device-sdk:${PKG_VERSION}-SNAPSHOT -Dtransitive=false
+      - mvn -B dependency:get -DrepoUrl=https://aws.oss.sonatype.org/content/repositories/snapshots -Dartifact=com.amazonaws:aws-iot-device-sdk-java:${PKG_VERSION}-SNAPSHOT -Dtransitive=false
 
 cache:
   paths:

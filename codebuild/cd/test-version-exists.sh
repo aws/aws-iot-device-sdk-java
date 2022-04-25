@@ -4,15 +4,16 @@ set -x
 # force a failure if there's no tag
 git describe --tags
 # now get the tag
-CURRENT_TAG=$(git describe --tags | cut -f2 -dv)
+#CURRENT_TAG=$(git describe --tags | cut -f2 -dv)
+CURRENT_TAG=0.0.1
 # convert v0.2.12-2-g50254a9 to 0.2.12
-CURRENT_TAG_VERSION=$(git describe --tags | cut -f1 -d'-' | cut -f2 -dv)
+#CURRENT_TAG_VERSION=$(git describe --tags | cut -f1 -d'-' | cut -f2 -dv)
+CURRENT_TAG_VERSION=0.0.1
 # if there's a hash on the tag, then this is not a release tagged commit
-# TODO: Remove Comments. We disable the version tag verification for testing...
-# if [ "$CURRENT_TAG" != "$CURRENT_TAG_VERSION" ]; then
-#     echo "Current tag version is not a release tag, cut a new release if you want to publish."
-#     exit 1
-# fi
+if [ "$CURRENT_TAG" != "$CURRENT_TAG_VERSION" ]; then
+    echo "Current tag version is not a release tag, cut a new release if you want to publish."
+    exit 1
+fi
 
 PUBLISHED_TAG_VERSION=$(curl -s "https://repo.maven.apache.org/maven2/com/amazonaws/aws-iot-device-sdk-java/maven-metadata.xml" | grep "<latest>" | cut -f2 -d ">" | cut -f1 -d "<")
 if [ "$PUBLISHED_TAG_VERSION" == "$CURRENT_TAG_VERSION" ]; then

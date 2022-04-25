@@ -30,7 +30,7 @@ phases:
       - export REPOSITORY_ID=$(cat $CODEBUILD_SRC_DIR_aws_iot_device_sdk_java_v1_jar/repositoryId.txt)
   build:
     commands:
-      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
+      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java/aws-iot-device-sdk-java
       # Trigger the release of the last staged package in the staging repository
       - mvn -B nexus-staging:release -Prelease -DstagingRepositoryId=$REPOSITORY_ID
 

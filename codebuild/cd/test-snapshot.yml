@@ -1,0 +1,26 @@
+version: 0.2
+#this buildspec assumes the ubuntu 16.04:x64 image
+# This job is responsible for artifacting the JAR which will have all of the other shared libs stuffed
+# into it once all platforms are built and artifacted
+phases:
+  install:
+    commands:
+      - sudo add-apt-repository ppa:openjdk-r/ppa
+      - sudo apt-get update -y
+      - sudo apt-get install openjdk-8-jdk-headless maven -y -f
+
+  pre_build:
+    commands:
+      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
+      - export PKG_VERSION=$(git describe --tags | sed -e s/^v//)
+
+  build:
+    commands:
+      # Verify that the package can be found in the snapshot repo
+      # note that this uses an ancient version of maven and the maven dependency plugin because we're on trusty
+      # http://maven.apache.org/plugins-archives/maven-dependency-plugin-2.1/get-mojo.html
+      - mvn -B dependency:get -DrepoUrl=https://aws.oss.sonatype.org/content/repositories/snapshots -Dartifact=com.amazonaws:aws-iot-device-sdk:${PKG_VERSION}-SNAPSHOT -Dtransitive=false
+
+cache:
+  paths:
+    - '/root/.m2/**/*'

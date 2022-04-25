@@ -19,9 +19,12 @@ phases:
       # install settings.xml to ~/.m2/settings.xml
       - mkdir -p $HOME/.m2
       - aws s3 cp s3://code-sharing-aws-crt/aws-crt-java.settings.xml $HOME/.m2/settings.xml
-      - export ST_PASSWORD=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/Password | cut -f2 -d":" | sed -e 's/[\\\"\}]//g')
+      - export SECRET_STRING=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/Password/V1)
+      - export ST_PASSWORD=$(jq -r '.username' ${SECRET_STRING})
+      - export ST_USERNAME=$(jq -r '.password' ${SECRET_STRING})
       # Use the password from secret manager to update the settings
       - sed -i 's/password-to-replace/'"$ST_PASSWORD"'/g' $HOME/.m2/settings.xml
+      - sed -i 's/\(<username>\).*\(<\/username>\)/<username>$ST_USERNAME<\/username>/g' $HOME/.m2/settings.xml
       # import gpg key
       - aws s3 cp s3://code-sharing-aws-crt/aws-sdk-common-runtime.key.asc /tmp/aws-sdk-common-runtime.key.asc
       - gpg --import /tmp/aws-sdk-common-runtime.key.asc

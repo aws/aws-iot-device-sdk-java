@@ -13,7 +13,7 @@ phases:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
       # - export PKG_VERSION=$(git describe --tags | sed -e s/^v//)
-      - - export PKG_VERSION=1.3.10
+      - - export PKG_VERSION=0.0.1
 
   build:
     commands:

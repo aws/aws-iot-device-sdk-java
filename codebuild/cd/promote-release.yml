@@ -15,7 +15,7 @@ phases:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
       # - export PKG_VERSION=$(git describe --tags | cut -f2 -dv)
-      - export PKG_VERSION=1.3.10
+      - export PKG_VERSION=0.0.1
       - echo PKG_VERSION=$PKG_VERSION
       # install settings.xml to ~/.m2/settings.xml
       - mkdir -p $HOME/.m2
@@ -30,7 +30,7 @@ phases:
       - export REPOSITORY_ID=$(cat $CODEBUILD_SRC_DIR_aws_iot_device_sdk_java_v1_jar/repositoryId.txt)
   build:
     commands:
-      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java/aws-iot-device-sdk-java
+      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
       # Trigger the release of the last staged package in the staging repository
       - mvn -B nexus-staging:release -Prelease -DstagingRepositoryId=$REPOSITORY_ID
 

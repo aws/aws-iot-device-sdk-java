@@ -7,8 +7,6 @@ set -e
 
 echo "Compiling source code (version $PKG_VERSION)..."
 mvn -s $HOME/.m2/settings.xml clean package -Dmaven.test.skip=true
-popd
-
 
 echo "Preparing release artifacts..."
 mkdir aws-iot-device-sdk-java-$PKG_VERSION

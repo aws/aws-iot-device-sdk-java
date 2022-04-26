@@ -21,8 +21,8 @@ mvn -s $HOME/.m2/settings.xml clean package -Dmaven.test.skip=true
 # popd
 
 
-echo "Cleaning up source code for release..."
-mvn -s $HOME/.m2/settings.xml clean
+# echo "Cleaning up source code for release..."
+# mvn -s $HOME/.m2/settings.xml clean
 
 
 # echo "Copying clean source code for release..."
@@ -43,7 +43,7 @@ mvn -s $HOME/.m2/settings.xml clean
 
 #echo "Removing temporary files..."
 #rm -rf $BASE_DIR/var/tmp/sdk-release
-echo "Clean up for publishing..."
-mvn -s $HOME/.m2/settings.xml clean deploy -P publishing -e -X
+# echo "Clean up for publishing..."
+# mvn -s $HOME/.m2/settings.xml clean deploy -P publishing -e -X
 echo "Release..."
 mvn -s $HOME/.m2/settings.xml nexus-staging:release -e -X

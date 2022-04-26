@@ -20,12 +20,15 @@ phases:
       # install settings.xml to ~/.m2/settings.xml
       - mkdir -p $HOME/.m2
       - aws s3 cp s3://code-sharing-aws-crt/iot-sdk-java-v1.settings.xml $HOME/.m2/settings.xml
-      - export SECRET_STRING=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/Password/V1)
-      - export ST_PASSWORD=$(jq -r '.username' <<< ${SECRET_STRING})
-      - export ST_USERNAME=$(jq -r '.password' <<< ${SECRET_STRING})
-      - export GPG_SECRET_STRING=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id gpg/IoT/JAVA/V1)
-      - export GPG_PRINCIPAL=$(jq -r '.username' <<< ${GPG_SECRET_STRING})
-      - export GPG_CREDENTIAL=$(jq -r '.password' <<< ${GPG_SECRET_STRING})
+      - aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/Password/V1 > sonatype_secret
+      - jq fromjson sonatype_secret > sonatype_json
+      - export ST_PASSWORD=$(jq -r '.username' sonatype_json)
+      - export ST_USERNAME=$(jq -r '.password' sonatype_json)
+      # get gpg secret
+      - aws --query "SecretString" secretsmanager get-secret-value --secret-id gpg/IoT/JAVA/V1 > gpg_secret
+      - jq fromjson gpg_secret > gpg_json
+      - export GPG_PRINCIPAL=$(jq -r '.username' gpg_json)
+      - export GPG_CREDENTIAL=$(jq -r '.password' gpg_json)
       # Use the password from secret manager to update the settings
       - sed -i 's/sonatype_Principal/'"$ST_USERNAME"'/g' $HOME/.m2/settings.xml
       - sed -i 's/sonatype_Credential/'"$ST_PASSWORD"'/g' $HOME/.m2/settings.xml

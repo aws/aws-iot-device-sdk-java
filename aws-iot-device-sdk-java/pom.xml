@@ -3,8 +3,8 @@
   <groupId>com.amazonaws</groupId>
   <artifactId>aws-iot-device-sdk-java</artifactId>
   <packaging>jar</packaging>
-  <version>1.3.9</version>
-  <name>AWS IoT Device SDK for Java</name>
+  <version>0.0.1</version>
+  <name>aws-iot-device-sdk-java</name>
   <description>The AWS IoT Device SDK for Java provides Java APIs for devices to connect to AWS IoT service using the MQTT protocol. The SDK also provides support for AWS IoT specific features, such as Thing Shadow and Thing Shadow abstraction.</description>
   <url>https://aws.amazon.com/iot/sdk</url>
   <licenses>
@@ -157,6 +157,17 @@
               </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.3</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://aws.oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+        </configuration>
       </plugin>
     </plugins>
   </build>

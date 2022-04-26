@@ -8,6 +8,7 @@ phases:
       - sudo add-apt-repository ppa:openjdk-r/ppa
       - sudo apt-get update -y
       - sudo apt-get install openjdk-8-jdk-headless maven -y -f
+      - sudo apt-get install jq
       # need latest awscli for secretsmanager
       - sudo pip3 install awscli --upgrade
 
@@ -23,9 +24,9 @@ phases:
       - export SECRET_STRING=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/Password/V1)
       - export ST_PASSWORD=$(jq -r '.username' ${SECRET_STRING})
       - export ST_USERNAME=$(jq -r '.password' ${SECRET_STRING})
-      - export SECRET_STRING=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id gpg/IoT/JAVA/V1)
-      - export GPG_PRINCIPAL=$(jq -r '.principal' ${SECRET_STRING})
-      - export GPG_CREDENTIAL=$(jq -r '.credential' ${SECRET_STRING})
+      - export GPG_SECRET_STRING=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id gpg/IoT/JAVA/V1)
+      - export GPG_PRINCIPAL=$(jq -r '.principal' ${GPG_SECRET_STRING})
+      - export GPG_CREDENTIAL=$(jq -r '.credential' ${GPG_SECRET_STRING})
       # Use the password from secret manager to update the settings
       - sed -i 's/sonatype_Principal/'"$ST_USERNAME"'/g' $HOME/.m2/settings.xml
       - sed -i 's/sonatype_Credential/'"$ST_PASSWORD"'/g' $HOME/.m2/settings.xml

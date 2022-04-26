@@ -27,7 +27,7 @@ mvn -s $HOME/.m2/settings.xml clean
 
 echo "Copying clean source code for release..."
 pushd aws-iot-device-sdk-java-$PKG_VERSION
-cp -Lr ../IotSdkJava-artifacts/aws-iot-device-sdk-java-samples samples
+cp -Lr ../aws-iot-device-sdk-java-samples samples
 pushd samples
 mv samples-pom.xml pom.xml
 popd

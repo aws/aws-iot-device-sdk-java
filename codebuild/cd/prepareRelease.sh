@@ -43,6 +43,7 @@ popd
 
 #echo "Removing temporary files..."
 #rm -rf $BASE_DIR/var/tmp/sdk-release
-
-mvn -s $HOME/.m2/settings.xml clean deploy -P publishing
-mvn -s $HOME/.m2/settings.xml nexus-staging:release
+echo "Clean up for publishing..."
+mvn -s $HOME/.m2/settings.xml clean deploy -P publishing -e -X
+echo "Release..."
+mvn -s $HOME/.m2/settings.xml nexus-staging:release -e -X

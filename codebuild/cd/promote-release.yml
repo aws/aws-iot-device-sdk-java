@@ -34,7 +34,7 @@ phases:
       - sed -i 's/sonatype_Credential/'"$ST_PASSWORD"'/g' $HOME/.m2/settings.xml
       - sed -i 's/gpg_Principal/'"$GPG_PRINCIPAL"'/g' $HOME/.m2/settings.xml
       - sed -i 's/gpg_Credential/'"$GPG_CREDENTIAL"'/g' $HOME/.m2/settings.xml
-      - export REPOSITORY_ID=$(cat $CODEBUILD_SRC_DIR_aws_iot_device_sdk_java_v1_jar/repositoryId.txt)
+      # - export REPOSITORY_ID=$(cat $CODEBUILD_SRC_DIR_aws_iot_device_sdk_java_v1_jar/repositoryId.txt)
   build:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java

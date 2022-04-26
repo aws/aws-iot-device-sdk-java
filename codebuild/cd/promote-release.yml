@@ -19,13 +19,18 @@ phases:
       - echo PKG_VERSION=$PKG_VERSION
       # install settings.xml to ~/.m2/settings.xml
       - mkdir -p $HOME/.m2
-      - aws s3 cp s3://code-sharing-aws-crt/aws-crt-java.settings.xml $HOME/.m2/settings.xml
+      - aws s3 cp s3://code-sharing-aws-crt/iot-sdk-java-v1.settings.xml $HOME/.m2/settings.xml
       - export SECRET_STRING=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/Password/V1)
       - export ST_PASSWORD=$(jq -r '.username' ${SECRET_STRING})
       - export ST_USERNAME=$(jq -r '.password' ${SECRET_STRING})
+      - export SECRET_STRING=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id gpg/IoT/JAVA/V1)
+      - export GPG_PRINCIPAL=$(jq -r '.principal' ${SECRET_STRING})
+      - export GPG_CREDENTIAL=$(jq -r '.credential' ${SECRET_STRING})
       # Use the password from secret manager to update the settings
-      - sed -i 's/password-to-replace/'"$ST_PASSWORD"'/g' $HOME/.m2/settings.xml
-      - sed -i 's/\(<username>\).*\(<\/username>\)/<username>$ST_USERNAME<\/username>/g' $HOME/.m2/settings.xml
+      - sed -i 's/sonatype_Principal/'"$ST_USERNAME"'/g' $HOME/.m2/settings.xml
+      - sed -i 's/sonatype_Credential/'"$ST_PASSWORD"'/g' $HOME/.m2/settings.xml
+      - sed -i 's/gpg_Principal/'"$GPG_PRINCIPAL"'/g' $HOME/.m2/settings.xml
+      - sed -i 's/gpg_Credential/'"$GPG_CREDENTIAL"'/g' $HOME/.m2/settings.xml
       # import gpg key
       - aws s3 cp s3://code-sharing-aws-crt/aws-sdk-common-runtime.key.asc /tmp/aws-sdk-common-runtime.key.asc
       - gpg --import /tmp/aws-sdk-common-runtime.key.asc

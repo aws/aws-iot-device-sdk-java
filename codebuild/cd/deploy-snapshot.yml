@@ -34,18 +34,17 @@ phases:
       - sed -i 's/sonatype_Credential/'"$ST_PASSWORD"'/g' $HOME/.m2/settings.xml
       - sed -i 's/gpg_Principal/'"$GPG_PRINCIPAL"'/g' $HOME/.m2/settings.xml
       - sed -i 's/gpg_Credential/'"$GPG_CREDENTIAL"'/g' $HOME/.m2/settings.xml
-      # import gpg key
-      - export GPG_PASSPHRASE=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id aws-sdk-common-runtime.key.asc/password | cut -f2 -d":" | sed -e 's/[\\\"\}]//g')
+
   build:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java/aws-iot-device-sdk-java
       # update the version to match the git tag, make a snapshot version we can test
       - mvn -B versions:set -DnewVersion=${PKG_VERSION}-SNAPSHOT
       # do a full build/deploy, but skip tests, since the shared libs were artifacts above
-      - mvn -B deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_PASSPHRASE
+      - mvn -B deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_CREDENTIAL
       # update the version to match the git tag, make a staging release which we will release once snapshot testing passes
       - mvn -B versions:set -DnewVersion=${PKG_VERSION}
-      - mvn -B deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_PASSPHRASE | tee /tmp/deploy.log
+      - mvn -B deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_CREDENTIAL | tee /tmp/deploy.log
       - cat /tmp/deploy.log | grep "Created staging repository with ID" | cut -d\" -f2 | tee /tmp/repositoryId.txt
 
 artifacts:

@@ -23,7 +23,6 @@ popd
 
 echo "Cleaning up source code for release..."
 mvn -s $HOME/.m2/settings.xml clean
-popd
 
 
 echo "Copying clean source code for release..."

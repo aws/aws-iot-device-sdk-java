@@ -14,7 +14,7 @@ phases:
 
   pre_build:
     commands:
-      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
+      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java/aws-iot-device-sdk-java
       # - export PKG_VERSION=$(git describe --tags | cut -f2 -dv)
       - export PKG_VERSION=0.0.1
       # install settings.xml to ~/.m2/settings.xml
@@ -22,8 +22,8 @@ phases:
       - aws s3 cp s3://code-sharing-aws-crt/iot-sdk-java-v1.settings.xml $HOME/.m2/settings.xml
       - aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/Password/V1 > sonatype_secret
       - jq fromjson sonatype_secret > sonatype_json
-      - export ST_PASSWORD=$(jq -r '.username' sonatype_json)
-      - export ST_USERNAME=$(jq -r '.password' sonatype_json)
+      - export ST_PASSWORD=$(jq -r '.password' sonatype_json)
+      - export ST_USERNAME=$(jq -r '.username' sonatype_json)
       # get gpg secret
       - aws --query "SecretString" secretsmanager get-secret-value --secret-id gpg/IoT/JAVA/V1 > gpg_secret
       - jq fromjson gpg_secret > gpg_json

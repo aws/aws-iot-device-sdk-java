@@ -24,8 +24,8 @@ phases:
       - aws s3 cp --recursive s3://code-sharing-aws-crt/gpg-java-v1/ maven-gpg 
       - aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/Password/V1 > sonatype_secret
       - jq fromjson sonatype_secret > sonatype_json
-      - export ST_PASSWORD=$(jq -r '.username' sonatype_json)
-      - export ST_USERNAME=$(jq -r '.password' sonatype_json)
+      - export ST_PASSWORD=$(jq -r '.password' sonatype_json)
+      - export ST_USERNAME=$(jq -r '.username' sonatype_json)
       - aws --query "SecretString" secretsmanager get-secret-value --secret-id gpg/IoT/JAVA/V1 > gpg_secret
       - jq fromjson gpg_secret > gpg_json
       - export GPG_PRINCIPAL=$(jq -r '.username' gpg_json)
@@ -36,6 +36,8 @@ phases:
       - sed -i 's/gpg_Principal/'"$GPG_PRINCIPAL"'/g' $HOME/.m2/settings.xml
       - sed -i 's/gpg_Credential/'"$GPG_CREDENTIAL"'/g' $HOME/.m2/settings.xml
       # - export REPOSITORY_ID=$(cat $CODEBUILD_SRC_DIR_aws_iot_device_sdk_java_v1_jar/repositoryId.txt)
+      - echo "checking settings files"
+      - cat $HOME/.m2/settings.xml
   build:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java

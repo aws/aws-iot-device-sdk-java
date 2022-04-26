@@ -24,7 +24,7 @@ mvn -s $HOME/.m2/settings.xml clean package -Dmaven.test.skip=true
 # echo "Cleaning up source code for release..."
 # mvn -s $HOME/.m2/settings.xml clean
 
-
+mv aws-iot-device-sdk-java-samples/samples-pom.xml aws-iot-device-sdk-java-samples/pom.xml
 # echo "Copying clean source code for release..."
 # pushd aws-iot-device-sdk-java-$PKG_VERSION
 # cp -Lr ../aws-iot-device-sdk-java-samples samples
@@ -43,7 +43,7 @@ mvn -s $HOME/.m2/settings.xml clean package -Dmaven.test.skip=true
 
 #echo "Removing temporary files..."
 #rm -rf $BASE_DIR/var/tmp/sdk-release
-# echo "Clean up for publishing..."
-# mvn -s $HOME/.m2/settings.xml clean deploy -P publishing -e -X
+echo "Clean up for publishing..."
+mvn -s $HOME/.m2/settings.xml clean deploy -P publishing -e -X
 echo "Release..."
 mvn -s $HOME/.m2/settings.xml nexus-staging:release -e -X

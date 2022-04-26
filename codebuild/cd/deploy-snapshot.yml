@@ -31,8 +31,6 @@ phases:
       - sed -i 's/gpg_Principal/'"$GPG_PRINCIPAL"'/g' $HOME/.m2/settings.xml
       - sed -i 's/gpg_Credential/'"$GPG_CREDENTIAL"'/g' $HOME/.m2/settings.xml
       # import gpg key
-      - aws s3 cp s3://code-sharing-aws-crt/aws-sdk-common-runtime.key.asc /tmp/aws-sdk-common-runtime.key.asc
-      - gpg --import /tmp/aws-sdk-common-runtime.key.asc
       - export GPG_PASSPHRASE=$(aws --query "SecretString" secretsmanager get-secret-value --secret-id aws-sdk-common-runtime.key.asc/password | cut -f2 -d":" | sed -e 's/[\\\"\}]//g')
   build:
     commands:

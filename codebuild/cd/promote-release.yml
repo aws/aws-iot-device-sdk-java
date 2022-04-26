@@ -39,7 +39,7 @@ phases:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
       # Trigger the release of the last staged package in the staging repository
-      - mvn -B nexus-staging:release -Prelease -DstagingRepositoryId=$REPOSITORY_ID
+      - bash ./codebuild/cd/prepareRelease.sh
 
 cache:
   paths:

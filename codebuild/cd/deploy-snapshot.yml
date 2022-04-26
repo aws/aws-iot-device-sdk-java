@@ -39,12 +39,12 @@ phases:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java/aws-iot-device-sdk-java
       # update the version to match the git tag, make a snapshot version we can test
-      - mvn -B versions:set -DnewVersion=${PKG_VERSION}-SNAPSHOT
+      - mvn -s $HOME/.m2/settings.xml versions:set -DnewVersion=${PKG_VERSION}-SNAPSHOT
       # do a full build/deploy, but skip tests, since the shared libs were artifacts above
-      - mvn -B deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_CREDENTIAL
+      - mvn -s $HOME/.m2/settings.xml deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_CREDENTIAL
       # update the version to match the git tag, make a staging release which we will release once snapshot testing passes
-      - mvn -B versions:set -DnewVersion=${PKG_VERSION}
-      - mvn -B deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_CREDENTIAL | tee /tmp/deploy.log
+      - mvn -s $HOME/.m2/settings.xml versions:set -DnewVersion=${PKG_VERSION}
+      - mvn -s $HOME/.m2/settings.xml deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_CREDENTIAL | tee /tmp/deploy.log
       - cat /tmp/deploy.log | grep "Created staging repository with ID" | cut -d\" -f2 | tee /tmp/repositoryId.txt
 
 artifacts:

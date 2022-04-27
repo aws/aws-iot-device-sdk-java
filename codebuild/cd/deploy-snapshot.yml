@@ -17,6 +17,8 @@ phases:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java/aws-iot-device-sdk-java
       # - export PKG_VERSION=$(git describe --tags | cut -f2 -dv)
       - export PKG_VERSION=0.0.1
+      # get maven-gpg 
+      - aws s3 cp --recursive s3://code-sharing-aws-crt/gpg-java-v1/ maven-gpg 
       # install settings.xml to ~/.m2/settings.xml
       - mkdir -p $HOME/.m2
       - aws s3 cp s3://code-sharing-aws-crt/iot-sdk-java-v1.settings.xml $HOME/.m2/settings.xml
@@ -34,17 +36,19 @@ phases:
       - sed -i 's/sonatype_Credential/'"$ST_PASSWORD"'/g' $HOME/.m2/settings.xml
       - sed -i 's/gpg_Principal/'"$GPG_PRINCIPAL"'/g' $HOME/.m2/settings.xml
       - sed -i 's/gpg_Credential/'"$GPG_CREDENTIAL"'/g' $HOME/.m2/settings.xml
+      - echo "printing settings"
+      - cat $HOME/.m2/settings.xml
 
   build:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java/aws-iot-device-sdk-java
       # update the version to match the git tag, make a snapshot version we can test
-      - mvn -B versions:set -DnewVersion=${PKG_VERSION}-SNAPSHOT
+      - mvn -s $HOME/.m2/settings.xml versions:set -DnewVersion=${PKG_VERSION}-SNAPSHOT -X -e 
       # do a full build/deploy, but skip tests, since the shared libs were artifacts above
-      - mvn -B deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_CREDENTIAL
+      - mvn -s $HOME/.m2/settings.xml deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_CREDENTIAL -X -e
       # update the version to match the git tag, make a staging release which we will release once snapshot testing passes
-      - mvn -B versions:set -DnewVersion=${PKG_VERSION}
-      - mvn -B deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_CREDENTIAL | tee /tmp/deploy.log
+      - mvn -s $HOME/.m2/settings.xml versions:set -DnewVersion=${PKG_VERSION} -X -e
+      - mvn -s $HOME/.m2/settings.xml deploy -Prelease -Dmaven.test.skip=true -Dgpg.passphrase=$GPG_CREDENTIAL | tee /tmp/deploy.log
       - cat /tmp/deploy.log | grep "Created staging repository with ID" | cut -d\" -f2 | tee /tmp/repositoryId.txt
 
 artifacts:

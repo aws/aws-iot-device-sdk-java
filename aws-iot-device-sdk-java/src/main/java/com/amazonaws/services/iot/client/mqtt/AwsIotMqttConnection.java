@@ -44,7 +44,8 @@ import lombok.Setter;
 @Setter
 public class AwsIotMqttConnection extends AwsIotConnection {
 
-    private static final String USERNAME_METRIC_STRING = "?SDK=Java&Version=1.3.9";
+    // Release Script will replace the version string on release. Refer to codebuild/cd/promote-release.yml
+    private static final String USERNAME_METRIC_STRING = "?SDK=Java&Version=0.0.1-dev";
     private final SocketFactory socketFactory;
 
     private MqttAsyncClient mqttClient;

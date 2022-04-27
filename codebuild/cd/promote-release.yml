@@ -1,0 +1,58 @@
+version: 0.2
+#this buildspec assumes the ubuntu 16.04:x64 image
+# This job is responsible for artifacting the JAR which will have all of the other shared libs stuffed
+# into it once all platforms are built and artifacted
+phases:
+  install:
+    commands:
+      - sudo add-apt-repository ppa:openjdk-r/ppa
+      - sudo apt-get update -y
+      - sudo apt-get install openjdk-8-jdk-headless maven -y -f
+      - sudo apt-get install jq -y
+      # need latest awscli for secretsmanager
+      - sudo pip3 install awscli --upgrade
+
+  pre_build:
+    commands:
+      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
+      - export PKG_VERSION=$(git describe --tags | cut -f2 -dv)
+      - echo PKG_VERSION=$PKG_VERSION
+      # Set version to PKG_VERSION
+      - sed -i 's/0.0.1-dev/'"$PKG_VERSION"'/g' pom.xml
+      - sed -i 's/0.0.1-dev/'"$PKG_VERSION"'/g' aws-iot-device-sdk-java/pom.xml
+      - sed -i 's/0.0.1-dev/'"$PKG_VERSION"'/g' aws-iot-device-sdk-java-samples/pom.xml
+      - sed -i 's/0.0.1-dev/'"$PKG_VERSION"'/g' aws-iot-device-sdk-java/src/main/java/com/amazonaws/services/iot/client/mqtt/AwsIotMqttConnection.java
+      # Get java v1 gpg files
+      - aws s3 cp --recursive s3://code-sharing-aws-crt/gpg-java-v1/ maven-gpg
+      # manully copy the maven-gpg in subfolder, since codeBuild does not set localRepository correctly
+      - cp -r maven-gpg aws-iot-device-sdk-java/maven-gpg
+      - cp -r maven-gpg aws-iot-device-sdk-java-samples/maven-gpg
+      # install settings.xml to ~/.m2/settings.xml
+      - mkdir -p $HOME/.m2
+      - aws s3 cp s3://code-sharing-aws-crt/iot-sdk-java-v1.settings.xml $HOME/.m2/settings.xml
+      - aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/Password/V1 > sonatype_secret
+      - jq fromjson sonatype_secret > sonatype_json
+      - export ST_PASSWORD=$(jq -r '.password' sonatype_json)
+      - export ST_USERNAME=$(jq -r '.username' sonatype_json)
+      - aws --query "SecretString" secretsmanager get-secret-value --secret-id gpg/IoT/JAVA/V1 > gpg_secret
+      - jq fromjson gpg_secret > gpg_json
+      - export GPG_PRINCIPAL=$(jq -r '.username' gpg_json)
+      - export GPG_CREDENTIAL=$(jq -r '.password' gpg_json)
+      # Use the password from secret manager to update the settings
+      - sed -i 's/sonatype_Principal/'"$ST_USERNAME"'/g' $HOME/.m2/settings.xml
+      - sed -i 's/sonatype_Credential/'"$ST_PASSWORD"'/g' $HOME/.m2/settings.xml
+      - sed -i 's/gpg_Principal/'"$GPG_PRINCIPAL"'/g' $HOME/.m2/settings.xml
+      - sed -i 's/gpg_Credential/'"$GPG_CREDENTIAL"'/g' $HOME/.m2/settings.xml
+      
+
+  build:
+    commands:
+      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
+      # Trigger the release of the last staged package in the staging repository
+      - mvn -s $HOME/.m2/settings.xml clean package -Dmaven.test.skip=true
+      - mvn -s $HOME/.m2/settings.xml clean deploy -P publishing -e -X
+      - mvn -s $HOME/.m2/settings.xml nexus-staging:release -e -X
+
+cache:
+  paths:
+    - "/root/.m2/**/*"

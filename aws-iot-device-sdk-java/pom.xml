@@ -1,44 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.amazonaws</groupId>
+  <parent>
+    <groupId>com.amazonaws</groupId>
+    <artifactId>aws-iot-device-sdk-java-pom</artifactId>
+    <version>0.0.2</version>
+  </parent>
   <artifactId>aws-iot-device-sdk-java</artifactId>
-  <packaging>jar</packaging>
-  <version>0.0.1</version>
-  <name>aws-iot-device-sdk-java</name>
-  <description>The AWS IoT Device SDK for Java provides Java APIs for devices to connect to AWS IoT service using the MQTT protocol. The SDK also provides support for AWS IoT specific features, such as Thing Shadow and Thing Shadow abstraction.</description>
-  <url>https://aws.amazon.com/iot/sdk</url>
-  <licenses>
-    <license>
-      <name>Apache License, Version 2.0</name>
-      <url>https://aws.amazon.com/apache2.0</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <developers>
-    <developer>
-      <id>amazonwebservices</id>
-      <organization>Amazon Web Services</organization>
-      <organizationUrl>https://aws.amazon.com</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
-  <scm>
-    <url>https://github.com/aws/aws-iot-device-sdk-java.git</url>
-  </scm>
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <gradle.command>./gradlew</gradle.command>
-  </properties>
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://aws.oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
   <dependencies>
     <dependency>
       <groupId>org.mockito</groupId>
@@ -155,31 +122,6 @@
               <configuration>
                 <systemPropertiesFile>src/test/java/com/amazonaws/services/iot/client/system_props_websocket.properties</systemPropertiesFile>
               </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.8</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://aws.oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>false</autoReleaseAfterClose>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

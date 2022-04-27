@@ -14,16 +14,16 @@ phases:
 
   pre_build:
     commands:
-      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java/aws-iot-device-sdk-java
+      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
       # - export PKG_VERSION=$(git describe --tags | cut -f2 -dv)
-      - export PKG_VERSION=0.0.1
+      - export PKG_VERSION=0.0.2
       - echo PKG_VERSION=$PKG_VERSION
       # install settings.xml to ~/.m2/settings.xml
       - mkdir -p $HOME/.m2
       - aws s3 cp s3://code-sharing-aws-crt/iot-sdk-java-v1.settings.xml $HOME/.m2/settings.xml
       - aws s3 cp --recursive s3://code-sharing-aws-crt/gpg-java-v1/ maven-gpg 
-      # - cp -r maven-gpg aws-iot-device-sdk-java/maven-gpg
-      # - cp -r maven-gpg aws-iot-device-sdk-java-samples/maven-gpg
+      - cp -r maven-gpg aws-iot-device-sdk-java/maven-gpg
+      - cp -r maven-gpg aws-iot-device-sdk-java-samples/maven-gpg
       - aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/Password/V1 > sonatype_secret
       - jq fromjson sonatype_secret > sonatype_json
       - export ST_PASSWORD=$(jq -r '.password' sonatype_json)
@@ -42,7 +42,7 @@ phases:
       - cat $HOME/.m2/settings.xml
   build:
     commands:
-      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java/aws-iot-device-sdk-java
+      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
       # Trigger the release of the last staged package in the staging repository
       # - bash ./codebuild/cd/prepareRelease.sh
       - mvn -s $HOME/.m2/settings.xml clean package -Dmaven.test.skip=true

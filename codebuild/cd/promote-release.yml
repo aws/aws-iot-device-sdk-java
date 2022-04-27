@@ -21,6 +21,7 @@ phases:
       - sed -i 's/0.0.1-dev/'"$PKG_VERSION"'/g' pom.xml
       - sed -i 's/0.0.1-dev/'"$PKG_VERSION"'/g' aws-iot-device-sdk-java/pom.xml
       - sed -i 's/0.0.1-dev/'"$PKG_VERSION"'/g' aws-iot-device-sdk-java-samples/pom.xml
+      - sed -i 's/0.0.1-dev/'"$PKG_VERSION"'/g' aws-iot-device-sdk-java/src/main/java/com/amazonaws/services/iot/client/mqtt/AwsIotMqttConnection.java
       # Get java v1 gpg files
       - aws s3 cp --recursive s3://code-sharing-aws-crt/gpg-java-v1/ maven-gpg
       # manully copy the maven-gpg in subfolder, since codeBuild does not set localRepository correctly

@@ -1,0 +1,10 @@
+version: 0.2
+#this build spec assumes the ubuntu 16.04:x64 image
+#this build run simply verifies we haven't published something at this tag yet.
+#if we have we fail the build and stop the pipeline, if we haven't we allow the pipeline to run.
+phases:
+  build:
+    commands:
+      - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
+      - bash ./codebuild/cd/test-version-exists.sh
+  

@@ -17,6 +17,8 @@ phases:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java/aws-iot-device-sdk-java
       # - export PKG_VERSION=$(git describe --tags | cut -f2 -dv)
       - export PKG_VERSION=0.0.1
+      # get maven-gpg 
+      - aws s3 cp --recursive s3://code-sharing-aws-crt/gpg-java-v1/ maven-gpg 
       # install settings.xml to ~/.m2/settings.xml
       - mkdir -p $HOME/.m2
       - aws s3 cp s3://code-sharing-aws-crt/iot-sdk-java-v1.settings.xml $HOME/.m2/settings.xml

@@ -240,10 +240,11 @@ client.subscribe(topic);
 
 **Note**: all operations (publish, subscribe, unsubscribe) will not timeout unless
 you define a timeout when performing the operation. If no timeout is defined, then
-a value of `0` is used, meaning the operation will never timeout and will wait
-forever for the server to respond.
-It is recommended to set a timeout for QoS1 operations so that if your application
-does not get an acknowledgement from the server for whatever reason, it is not stuck.
+a value of `0` is used, meaning the operation will never timeout and, in rare cases,
+wait forever for the server to respond and block the calling thread indefinitely.
+It is recommended to set a timeout for QoS1 operations if your application expects
+responses within a fixed duration or if there is the possibility the server you are
+communicating with may not respond.
 
 ### Shadow Methods
 To access a shadow using a blocking API:

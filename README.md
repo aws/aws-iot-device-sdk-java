@@ -413,17 +413,17 @@ KeyStorePasswordPair pair = SampleUtil.getKeyStorePasswordPair(certificateFile, 
 If you are getting a `too many publishes in Progress` error this means that your application
 has more operations in-flight (meaning they have not succeeded or failed, but they are waiting
 for a response from the server) than Paho supports by default.
-By default, the Paho client supports a maximum of `10` in-flight messages.
+By default, the Paho client supports a maximum of `10` in-flight operations.
 
 The recommended way to resolve this issue is to track how many QoS1 operations you
 have sent that are in-flight and when you reach
 the limit of `10`, you add any further operations into a queue. Then as the QoS1 operations
 are no longer in-flight you grab QoS1 operations from the queue until it is empty or until you
-have hit the maximum of `10` in-flight messages. You then repeat this process until all the operations
+have hit the maximum of `10` in-flight operations. You then repeat this process until all the operations
 are sent. This will prevent your application from ever trying to send too many operations at once and
 exceeding the maximum in-flight limit of the Paho client.
 
-Another way to help reduce this issue is to increase the maximum number of in-flight messages
+Another way to help reduce this issue is to increase the maximum number of in-flight operations
 that the Paho client can process. To do this, you will need to modify the source code to increase
 this limit. Download the source code from GitHub, navigate to the `AwsIotMqttConnection.java`
 file, and add the following line of code in the `buildMqttConnectOptions` function just under
@@ -437,12 +437,12 @@ Then compile the source code and use the compiled Jar in your application.
 
 This will increase Paho's in-flight limit to 100 and allow you to have more in-flight
 at the same time, giving additional room for sending larger volumes of QoS1 operations.
-Note that these in-flight messages still need to be acknowledged by the server or timeout
+Note that these in-flight operations still need to be acknowledged by the server or timeout
 before they are no longer in-flight, you can just have up to `100` in-flight rather than
 the default of `10`.
 
 For AWS IoT Core, you can only send a maximum of **`100` QoS1 operations per second**.
-Any messages sent after the first 100 per second will be
+Any operations sent after the first 100 per second will be
 ignored by AWS IoT Core. For this reason, it is **highly** recommended you perform
 all operations with a timeout if you increase the maximum in-flight limit, to prevent a situation
 where you send more than 100 QoS1 operations per second and are waiting on an operation to get

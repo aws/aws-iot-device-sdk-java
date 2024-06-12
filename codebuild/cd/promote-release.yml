@@ -33,6 +33,7 @@ phases:
       - aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/token/V1 > sonatype_secret
       - jq fromjson sonatype_secret > sonatype_json
       - export ST_PASSWORD=$(jq -r '.password' sonatype_json)
+      - export ESCAPED_PASSWORD=$(printf '%s\n' "$ST_PASSWORD" | sed 's:[\\/&]:\\&:g')
       - export ST_USERNAME=$(jq -r '.username' sonatype_json)
       - aws --query "SecretString" secretsmanager get-secret-value --secret-id gpg/IoT/JAVA/V1 > gpg_secret
       - jq fromjson gpg_secret > gpg_json
@@ -40,7 +41,7 @@ phases:
       - export GPG_CREDENTIAL=$(jq -r '.password' gpg_json)
       # Use the password from secret manager to update the settings
       - sed -i 's/sonatype_Principal/'"$ST_USERNAME"'/g' $HOME/.m2/settings.xml
-      - sed -i 's/sonatype_Credential/'"$ST_PASSWORD"'/g' $HOME/.m2/settings.xml
+      - sed -i 's/sonatype_Credential/'"$ESCAPED_PASSWORD"'/g' $HOME/.m2/settings.xml
       - sed -i 's/gpg_Principal/'"$GPG_PRINCIPAL"'/g' $HOME/.m2/settings.xml
       - sed -i 's/gpg_Credential/'"$GPG_CREDENTIAL"'/g' $HOME/.m2/settings.xml
 

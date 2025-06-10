@@ -15,6 +15,9 @@ env:
   AWS_DEFAULT_REGION: us-east-1
   SDK_V1_CI_ROLE: ${{ secrets.CI_SDK_V1_ROLE_ARN }}
 
+permissions:
+  id-token: write # This is required for requesting the JWT
+
 jobs:
   java-compat:
     runs-on: ubuntu-latest

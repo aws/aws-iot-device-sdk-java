@@ -18,7 +18,7 @@ env:
 
 jobs:
   java-compat:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:

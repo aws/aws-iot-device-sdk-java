@@ -12,9 +12,8 @@ env:
   BUILDER_HOST: https://d19elf31gohf1l.cloudfront.net
   PACKAGE_NAME: aws-iot-device-sdk-java
   RUN: ${{ github.run_id }}-${{ github.run_number }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: us-east-1
+  SDK_V1_CI_ROLE: ${{ secrets.CI_SDK_V1_ROLE_ARN }}
 
 jobs:
   java-compat:
@@ -35,6 +34,10 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.version }}
           cache: maven
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.SDK_V1_CI_ROLE }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
       - name: Build ${{ env.PACKAGE_NAME }} + consumers
         run: |
           java -version

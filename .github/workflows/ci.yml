@@ -14,6 +14,7 @@ env:
   RUN: ${{ github.run_id }}-${{ github.run_number }}
   AWS_DEFAULT_REGION: us-east-1
   SDK_V1_CI_ROLE: ${{ secrets.CI_SDK_V1_ROLE_ARN }}
+  CRT_CI_Role: arn:aws:iam::123124136734:role/CRT_CI_Role
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -41,7 +42,7 @@ jobs:
         id: creds
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ env.SDK_V1_CI_ROLE }}
+          role-to-assume: ${{ env.CRT_CI_Role }}
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
           output-credentials: true
       - name: Build ${{ env.PACKAGE_NAME }} + consumers

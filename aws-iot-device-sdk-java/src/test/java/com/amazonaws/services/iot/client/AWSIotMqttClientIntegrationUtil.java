@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.io.FileInputStream;
 import java.security.KeyStore;
+import java.util.UUID;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -14,14 +15,14 @@ import com.amazonaws.services.iot.client.CredentialUtil;
 
 public class AWSIotMqttClientIntegrationUtil {
 
-    private static final String CLIENT_ENDPOINT = System.getProperty("clientEndpoint");
-    private static final String CLIENT_ID = System.getProperty("clientId");
+    private static final String CLIENT_ENDPOINT = "ajje7lpljulm4-ats.iot.us-east-1.amazonaws.com";
+    private static final String CLIENT_ID = UUID.randomUUID().toString();
 
     private static final String AUTH_MODE = System.getProperty("authMode");
 
     private static final Boolean IS_WEBSOCKET = Boolean.parseBoolean(System.getProperty("isWebSocket"));
-    private static final String PUBLIC_MATERIAL = System.getProperty("publicMaterial");
-    private static final String PRIVATE_MATERIAL = System.getProperty("privateMaterial");
+    private static final String PUBLIC_MATERIAL = "arn:aws:secretsmanager:us-east-1:123124136734:secret:V1IotSdkIntegrationTestCertificate-vTRwjE";
+    private static final String PRIVATE_MATERIAL = "arn:aws:secretsmanager:us-east-1:123124136734:secret:V1IotSdkIntegrationTestPrivateKey-vNUQU8";
     private static final String KEYSTORE_FILE = System.getProperty("keystoreFile");
     private static final String KEYSTORE_PASSWORD = System.getProperty("keystorePassword");
     private static final String KEY_PASSWORD = System.getProperty("keyPassword");

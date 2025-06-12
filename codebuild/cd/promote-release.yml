@@ -50,7 +50,7 @@ phases:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
       - mvn -B versions:set -DnewVersion=${PKG_VERSION}
-      - mvn deploy -Dmaven.test.skip=true
+      - mvn clean deploy -P publishing -Dmaven.test.skip=true
 
 cache:
   paths:

@@ -37,11 +37,19 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.version }}
           cache: maven
-      - uses: aws-actions/configure-aws-credentials@v4
+      - name: Configure AWS Credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.SDK_V1_CI_ROLE }}
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          output-credentials: true
       - name: Build ${{ env.PACKAGE_NAME }} + consumers
         run: |
           java -version
           mvn -B test
+        env: 
+          AWS_ACCESS_KEY_ID: ${{ steps.creds.outputs.aws-access-key-id }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.creds.outputs.aws-secret-access-key }}
+          AWS_SESSION_TOKEN: ${{ steps.creds.outputs.aws-session-token }}
+          AWS_REGION: ${{ env.AWS_DEFAULT_REGION }}

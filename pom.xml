@@ -5,7 +5,7 @@
   <version>0.0.1-dev</version>
   <packaging>pom</packaging>
   <name>AWS IoT Device SDK for Java</name>
-  <description>The AWS IoT Device SDK for Java provides Java APIs for devices to connect to AWS IoT service using the MQTT protocol. The SDK also provides support for AWS IoT specific features, such as Thing Shadow and Thing Shadow abstraction.</description>
+  <description>The SDK is in maintenance mode, and no longer receive feature updates. Checkout aws-iot-device-sdk for new features. The AWS IoT Device SDK for Java provides Java APIs for devices to connect to AWS IoT service using the MQTT protocol. The SDK also provides support for AWS IoT specific features, such as Thing Shadow and Thing Shadow abstraction.</description>
   <url>https://aws.amazon.com/iot/sdk</url>
   <licenses>
     <license>
@@ -34,23 +34,16 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://aws.oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-  </distributionManagement>
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.8</version>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.7.0</version>
         <extensions>true</extensions>
         <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://aws.oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+            <publishingServerId>central</publishingServerId>
+            <autoPublish>true</autoPublish>
         </configuration>
       </plugin>
       <plugin>
@@ -66,7 +59,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
+        <version>3.2.7</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>

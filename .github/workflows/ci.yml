@@ -12,13 +12,15 @@ env:
   BUILDER_HOST: https://d19elf31gohf1l.cloudfront.net
   PACKAGE_NAME: aws-iot-device-sdk-java
   RUN: ${{ github.run_id }}-${{ github.run_number }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: us-east-1
+  SDK_V1_CI_ROLE: ${{ secrets.CI_SDK_V1_ROLE_ARN }}
+
+permissions:
+  id-token: write # This is required for requesting the JWT
 
 jobs:
   java-compat:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -30,12 +32,23 @@ jobs:
       - name: Checkout Sources
         uses: actions/checkout@v2
       - name: Setup Java
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3.14.1
         with:
           distribution: temurin
           java-version: ${{ matrix.version }}
           cache: maven
+      - name: Configure AWS Credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.SDK_V1_CI_ROLE }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          output-credentials: true
       - name: Build ${{ env.PACKAGE_NAME }} + consumers
         run: |
           java -version
           mvn -B test
+        env: 
+          AWS_ACCESS_KEY_ID: ${{ steps.creds.outputs.aws-access-key-id }}
+          AWS_SECRET_ACCESS_KEY: ${{ steps.creds.outputs.aws-secret-access-key }}
+          AWS_SESSION_TOKEN: ${{ steps.creds.outputs.aws-session-token }}

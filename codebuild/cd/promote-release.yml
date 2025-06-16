@@ -29,7 +29,7 @@ phases:
       - cp -r maven-gpg aws-iot-device-sdk-java-samples/maven-gpg
       # install settings.xml to ~/.m2/settings.xml
       - mkdir -p $HOME/.m2
-      - aws s3 cp s3://code-sharing-aws-crt/iot-sdk-java-v1.settings.xml $HOME/.m2/settings.xml
+      - aws s3 cp s3://code-sharing-aws-crt/iot-sdk-java-v1.settings.central.xml $HOME/.m2/settings.xml
       - aws --query "SecretString" secretsmanager get-secret-value --secret-id Sonatype/JIRA/token/V1 > sonatype_secret
       - jq fromjson sonatype_secret > sonatype_json
       - export ST_PASSWORD=$(jq -r '.password' sonatype_json)
@@ -49,10 +49,8 @@ phases:
   build:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
-      # Trigger the release of the last staged package in the staging repository
-      - mvn -s $HOME/.m2/settings.xml clean package -Dmaven.test.skip=true
-      - mvn -s $HOME/.m2/settings.xml clean deploy -P publishing -e -X
-      - mvn -s $HOME/.m2/settings.xml nexus-staging:release -e -X
+      - mvn -B versions:set -DnewVersion=${PKG_VERSION}
+      - mvn clean deploy -P publishing -Dmaven.test.skip=true
 
 cache:
   paths:

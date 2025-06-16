@@ -15,14 +15,14 @@ import com.amazonaws.services.iot.client.CredentialUtil;
 
 public class AWSIotMqttClientIntegrationUtil {
 
-    private static final String CLIENT_ENDPOINT = "a16523t7iy5uyg-ats.iot.us-east-1.amazonaws.com";
+    private static final String CLIENT_ENDPOINT = System.getProperty("clientEndpoint");
     private static final String CLIENT_ID = UUID.randomUUID().toString();
 
-    private static final String AUTH_MODE = "CertificateMutualAuthentication";
+    private static final String AUTH_MODE = System.getProperty("authMode");
 
-    private static final Boolean IS_WEBSOCKET = false;
-    private static final String PUBLIC_MATERIAL = "arn:aws:secretsmanager:us-east-1:123124136734:secret:unit-test/certificate-iZBV7L";
-    private static final String PRIVATE_MATERIAL = "arn:aws:secretsmanager:us-east-1:123124136734:secret:unit-test/privatekey-p8-d3pMKx";
+    private static final Boolean IS_WEBSOCKET = Boolean.parseBoolean(System.getProperty("isWebSocket"));;
+    private static final String PUBLIC_MATERIAL = System.getProperty("publicMaterial");
+    private static final String PRIVATE_MATERIAL = System.getProperty("privateMaterial");
     private static final String KEYSTORE_FILE = System.getProperty("keystoreFile");
     private static final String KEYSTORE_PASSWORD = System.getProperty("keystorePassword");
     private static final String KEY_PASSWORD = System.getProperty("keyPassword");

@@ -14,12 +14,12 @@ import com.amazonaws.services.iot.client.CredentialUtil;
 
 public class AWSIotMqttClientIntegrationUtil {
 
-    public static final String CLIENT_ENDPOINT = System.getProperty("clientEndpoint");
+    private static final String CLIENT_ENDPOINT = System.getProperty("clientEndpoint");
     private static final String CLIENT_ID = System.getProperty("clientId");
 
-    public static final String AUTH_MODE = System.getProperty("authMode");
+    private static final String AUTH_MODE = System.getProperty("authMode");
 
-    public static final Boolean IS_WEBSOCKET = Boolean.parseBoolean(System.getProperty("isWebSocket"));;
+    private static final Boolean IS_WEBSOCKET = Boolean.parseBoolean(System.getProperty("isWebSocket"));;
     private static final String PUBLIC_MATERIAL = System.getProperty("publicMaterial");
     private static final String PRIVATE_MATERIAL = System.getProperty("privateMaterial");
     private static final String KEYSTORE_FILE = System.getProperty("keystoreFile");

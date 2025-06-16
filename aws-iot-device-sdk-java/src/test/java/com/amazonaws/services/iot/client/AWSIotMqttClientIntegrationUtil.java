@@ -16,7 +16,7 @@ import com.amazonaws.services.iot.client.CredentialUtil;
 public class AWSIotMqttClientIntegrationUtil {
 
     public static final String CLIENT_ENDPOINT = System.getProperty("clientEndpoint");
-    private static final String CLIENT_ID = UUID.randomUUID().toString();
+    private static final String CLIENT_ID = System.getProperty("clientId");
 
     public static final String AUTH_MODE = System.getProperty("authMode");
 

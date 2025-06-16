@@ -5,7 +5,6 @@ import static org.junit.Assert.fail;
 
 import java.io.FileInputStream;
 import java.security.KeyStore;
-import java.util.UUID;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;

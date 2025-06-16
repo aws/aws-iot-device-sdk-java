@@ -76,7 +76,7 @@ public class CredentialUtil {
             return newMqttTlsClient(clientEndpoint, clientId+TEST_UID, publicMaterial, privateMaterial);
         } else {
             // For WebSocket, the public material is the AWS access key id and the private material is the AWS secret access key.
-            // Grab the test info from environment variables.
+            // Grab the credential info from environment variables.
             String accessKeyId = System.getenv("AWS_ACCESS_KEY_ID");
             String privateKey = System.getenv("AWS_SECRET_ACCESS_KEY");
             String sessionToken = System.getenv("AWS_SESSION_TOKEN");

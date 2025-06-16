@@ -33,6 +33,8 @@ public class AWSIotDeviceIntegrationTest implements TestDeviceNotifier {
     @Before
     public void setup() {
         client = AWSIotMqttClientIntegrationUtil.getClient();
+        LOGGER.warning("Setup integration test, with websocket:" + AWSIotMqttClientIntegrationUtil.IS_WEBSOCKET + ", auth mode:" 
+        + AWSIotMqttClientIntegrationUtil.AUTH_MODE + "endpoint:" + AWSIotMqttClientIntegrationUtil.CLIENT_ENDPOINT);
         assertNotNull("Client not initialized likely due to required system properties not being provided", client);
         assertNotNull("thingName was not provided", THING_NAME);
     }

@@ -6,6 +6,8 @@
     <version>0.0.1-dev</version>
   </parent>
   <artifactId>aws-iot-device-sdk-java</artifactId>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>This SDK is now in maintenance mode and will not receive new features. For the latest functionality, please use aws-iot-device-sdk. The AWS IoT Device SDK for Java lets your device applications communicate with the AWS IoT Core service over MQTT. In addition to basic MQTT messaging, it includes built-in support for AWS IoT services such as Thing Shadows, Jobs, and Fleet Provisioning.</description>
   <dependencies>
     <dependency>
       <groupId>org.mockito</groupId>

@@ -48,13 +48,14 @@ phases:
 
       - aws s3 cp s3://code-sharing-aws-crt/aws-iot-java-sdk.asc .
       - gpg --batch --import aws-iot-java-sdk.asc
+      # refer to https://maven.apache.org/plugins/maven-gpg-plugin/usage.html
       - export MAVEN_GPG_PASSPHRASE=$GPG_CREDENTIAL
 
   build:
     commands:
       - cd $CODEBUILD_SRC_DIR/aws-iot-device-sdk-java
       - mvn -B versions:set -DnewVersion=${PKG_VERSION}
-      - mvn -B deploy -Dmaven.test.skip=true
+      - mvn -B clean deploy -Dmaven.test.skip=true -e -X
 
 cache:
   paths:

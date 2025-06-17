@@ -1,5 +1,5 @@
 version: 0.2
-# Assumes are running using the Ubuntu Codebuild standard image
+# Assumes this is running on the Ubuntu CodeBuild standard image.
 # This job is responsible for artifacting the JAR which will have all of the other shared libs stuffed
 # into it once all platforms are built and artifacted
 phases:
